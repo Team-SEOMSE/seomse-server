@@ -1,4 +1,4 @@
-package com.seomse.jwt.filter;
+package com.seomse.security.jwt.filter;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -9,7 +9,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seomse.common.exception.dto.ExceptionResult;
-import com.seomse.jwt.exception.JwtTokenException;
+import com.seomse.security.jwt.exception.JwtTokenException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

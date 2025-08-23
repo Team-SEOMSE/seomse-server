@@ -1,4 +1,4 @@
-package com.seomse.jwt.dto;
+package com.seomse.security.jwt.dto;
 
 public record JwtToken(
 	String accessToken,

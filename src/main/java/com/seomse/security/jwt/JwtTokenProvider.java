@@ -1,4 +1,4 @@
-package com.seomse.jwt;
+package com.seomse.security.jwt;
 
 import java.security.Key;
 import java.util.Collections;
@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seomse.jwt.dto.LoginUserInfo;
+import com.seomse.security.jwt.dto.LoginUserInfo;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

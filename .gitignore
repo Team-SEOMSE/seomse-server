@@ -36,4 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 
+### QClass ###
+src/main/generated/
+
+### yml ###
 **/resources/*.yml
