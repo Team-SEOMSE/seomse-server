@@ -3,10 +3,10 @@
 
 ==== HTTP Request
 
-include::{snippets}/user-login/http-request.adoc[]
-include::{snippets}/user-login/request-fields.adoc[]
+include::{snippets}/auth-normalLogin/http-request.adoc[]
+include::{snippets}/auth-normalLogin/request-fields.adoc[]
 
 ==== HTTP Response
 
-include::{snippets}/user-login/http-response.adoc[]
-include::{snippets}/user-login/response-fields.adoc[]
+include::{snippets}/auth-normalLogin/http-response.adoc[]
+include::{snippets}/auth-normalLogin/response-fields.adoc[]

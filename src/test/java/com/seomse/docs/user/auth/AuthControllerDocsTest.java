@@ -1,8 +1,11 @@
 package com.seomse.docs.user.auth;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -10,13 +13,9 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.seomse.docs.RestDocsSupport;
 import com.seomse.user.auth.controller.AuthController;
@@ -41,7 +40,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 		// given
 		LoginRequest request = new LoginRequest("user@email.com", "abc1234!", Role.CLIENT);
 
-		BDDMockito.given(authService.normalLogin(ArgumentMatchers.any(LoginServiceRequest.class)))
+		given(authService.normalLogin(any(LoginServiceRequest.class)))
 			.willReturn(new LoginResponse(
 				"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VySWRcIjpcImY4MWQ0ZmFlLTdkZWMtMTFkMC1hNzY1LTAwYTBjO"
 					+ "TFlNmJmNlwiLFwicm9sZVwiOlwiQ0xJRU5UXCJ9IiwiZXhwIjoxNzU1OTY3MTA4LCJVVUlEIjoiOTdhOWRlMWItNGFiNS00"
@@ -51,15 +50,15 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 
 		// when // then
 		mockMvc.perform(
-				MockMvcRequestBuilders.post("/user/auth/login")
+				post("/user/auth/login")
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 			)
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andDo(document("auth-normalLogin",
-				preprocessRequest(Preprocessors.prettyPrint()),
-				preprocessResponse(Preprocessors.prettyPrint()),
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
 				requestFields(
 					fieldWithPath("email").type(JsonFieldType.STRING)
 						.description("이메일"),
