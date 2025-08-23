@@ -38,6 +38,6 @@ public class AuthService {
 		LoginUserInfo userInfo = new LoginUserInfo(client.getId(), request.role());
 		JwtToken jwtToken = jwtTokenGenerator.generate(userInfo);
 
-		return new LoginResponse(jwtToken);
+		return new LoginResponse(jwtToken.accessToken());
 	}
 }

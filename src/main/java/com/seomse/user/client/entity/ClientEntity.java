@@ -42,4 +42,13 @@ public class ClientEntity extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	private Age age;
+
+	// 테스트 전용: 패키지 전용 생성자 (public 아님)
+	ClientEntity(String email, String encodedPassword, SnsType snsType, Gender gender, Age age) {
+		this.email = email;
+		this.password = encodedPassword;
+		this.snsType = snsType;
+		this.gender = gender;
+		this.age = age;
+	}
 }

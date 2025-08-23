@@ -8,3 +8,8 @@ endif::[]
 :toc: left
 :toclevels: 2
 :sectlinks:
+
+[[Auth-API]]
+== AUTH API
+
+include::user/auth.adoc[]
