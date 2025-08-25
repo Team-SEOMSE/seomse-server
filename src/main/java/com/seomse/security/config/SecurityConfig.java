@@ -64,7 +64,8 @@ public class SecurityConfig {
 			pathPattern.matcher("/h2-console/**"),
 			pathPattern.matcher("/docs/**"),
 			pathPattern.matcher("/v3/api-docs/**"),
-			pathPattern.matcher("/error")
+			pathPattern.matcher("/error"),
+			pathPattern.matcher("/health-check")
 		};
 	}
 }
