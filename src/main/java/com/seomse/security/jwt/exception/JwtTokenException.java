@@ -1,4 +1,4 @@
-package com.seomse.jwt.exception;
+package com.seomse.security.jwt.exception;
 
 import lombok.Getter;
 

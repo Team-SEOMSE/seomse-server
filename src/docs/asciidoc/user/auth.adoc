@@ -1,0 +1,12 @@
+[[auth-normalLogin]]
+=== 일반 로그인
+
+==== HTTP Request
+
+include::{snippets}/auth-normalLogin/http-request.adoc[]
+include::{snippets}/auth-normalLogin/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/auth-normalLogin/http-response.adoc[]
+include::{snippets}/auth-normalLogin/response-fields.adoc[]

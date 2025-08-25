@@ -1,4 +1,4 @@
-package com.seomse.jwt;
+package com.seomse.security.jwt;
 
 import java.util.Date;
 
@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seomse.jwt.dto.JwtToken;
-import com.seomse.jwt.dto.LoginUserInfo;
-import com.seomse.jwt.exception.JwtTokenException;
+import com.seomse.security.jwt.dto.JwtToken;
+import com.seomse.security.jwt.dto.LoginUserInfo;
+import com.seomse.security.jwt.exception.JwtTokenException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtTokenGenerator {
 
 	private static final String BEARER_TYPE = "Bearer";
-	private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;  // 30 minutes
+	private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;  // 60 minutes
 	private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 15;  // 15 days
 
 	private final ObjectMapper objectMapper;
