@@ -68,10 +68,23 @@ jobs:
         run: |
           scp ./deploy.zip ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/deploy.zip
           ssh ec2-user@${{ secrets.EC2_HOST }} "
-            unzip -o /home/ec2-user/deploy.zip -d /home/ec2-user &&
-            rm -rf /home/ec2-user/app/* &&
-            mv /home/ec2-user/before-deploy/* /home/ec2-user/app/ &&
-            chmod +x /home/ec2-user/app/scripts/*.sh"
+            set -euo pipefail
+            unzip -o /home/ec2-user/deploy.zip -d /home/ec2-user
+
+            if [ -e /home/ec2-user/app ] && [ ! -d /home/ec2-user/app ]; then
+              rm -f /home/ec2-user/app
+            fi
+
+            mkdir -p /home/ec2-user/app
+
+            rm -rf /home/ec2-user/app/*
+            mv /home/ec2-user/before-deploy/* /home/ec2-user/app/
+
+            if [ -d /home/ec2-user/app/scripts ]; then
+              chmod +x /home/ec2-user/app/scripts/*.sh || true
+            fi
+          "
+
 
       - name: 🎯 EC2 서버에서 배포 실행 (AfterInstall)
         run: |
