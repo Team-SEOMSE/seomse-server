@@ -3,10 +3,11 @@ package com.seomse.common.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import java.io.IOException;
-import java.net.BindException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,6 +40,16 @@ public class ExceptionControllerAdvice {
 	@ResponseStatus(BAD_REQUEST)
 	@ExceptionHandler(BindException.class)
 	public ResponseEntity<Object> bindException(BindException e) {
+		log.error(e.getMessage(), e);
+
+		return ResponseEntity.status(BAD_REQUEST)
+			.body(new ExceptionResult(BAD_REQUEST.name(), e.getMessage()));
+	}
+
+	/** Handles request body validation errors (MethodArgumentNotValidException). */
+	@ResponseStatus(BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<Object> methodArgumentNotValidException(MethodArgumentNotValidException e) {
 		log.error(e.getMessage(), e);
 
 		return ResponseEntity.status(BAD_REQUEST)
