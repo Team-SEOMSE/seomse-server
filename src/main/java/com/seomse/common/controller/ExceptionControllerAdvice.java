@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.seomse.common.exception.DuplicateEmailException;
 import com.seomse.common.exception.dto.ExceptionResult;
 import com.seomse.security.jwt.exception.JwtTokenException;
 
@@ -79,7 +80,7 @@ public class ExceptionControllerAdvice {
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<Object> staticResourceNotFound(NoResourceFoundException e) {
 		log.error(e.getMessage(), e);
-		
+
 		return ResponseEntity.status(NOT_FOUND)
 			.body(new ExceptionResult(NOT_FOUND.name(), e.getMessage()));
 	}
@@ -92,5 +93,15 @@ public class ExceptionControllerAdvice {
 
 		return ResponseEntity.status(NOT_FOUND)
 			.body(new ExceptionResult(NOT_FOUND.name(), e.getMessage()));
+	}
+
+	/** Handles duplicate email exception (409 Conflict). */
+	@ResponseStatus(CONFLICT)
+	@ExceptionHandler(DuplicateEmailException.class)
+	public ResponseEntity<Object> duplicateEmailException(DuplicateEmailException e) {
+		log.error(e.getMessage());
+
+		return ResponseEntity.status(CONFLICT)
+			.body(new ExceptionResult(CONFLICT.name(), e.getMessage()));
 	}
 }
