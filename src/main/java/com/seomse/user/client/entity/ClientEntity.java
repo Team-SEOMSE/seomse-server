@@ -58,4 +58,11 @@ public class ClientEntity extends BaseTimeEntity {
 		this.gender = gender;
 		this.age = age;
 	}
+
+	public ClientEntity updateProfile(Gender gender, Age age) {
+		this.gender = gender;
+		this.age = age;
+
+		return this;
+	}
 }
