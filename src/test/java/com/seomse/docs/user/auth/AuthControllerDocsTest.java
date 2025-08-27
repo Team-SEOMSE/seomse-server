@@ -120,7 +120,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
 						.description("코드"),
 					fieldWithPath("data").type(JsonFieldType.STRING)
-						.description("응답 데이터, user 고유값 ID")
+						.description("응답 데이터, 저장된 사용자 ID")
 				)
 			));
 	}

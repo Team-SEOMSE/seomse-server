@@ -19,8 +19,6 @@ import com.seomse.user.auth.service.request.SignupServiceRequest;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
 import com.seomse.user.auth.service.response.LoginResponse;
 import com.seomse.user.client.entity.ClientEntity;
-import com.seomse.user.client.enums.Age;
-import com.seomse.user.client.enums.Gender;
 import com.seomse.user.client.enums.SnsType;
 import com.seomse.user.client.repository.ClientRepository;
 
@@ -48,8 +46,7 @@ class AuthServiceTest extends IntegrationTestSupport {
 		String password = "abc1234!";
 		SnsType snsType = SnsType.NORMAL;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType,
-			Gender.MALE, Age.TWENTIES);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, null, null);
 
 		clientRepository.save(client);
 
@@ -89,8 +86,7 @@ class AuthServiceTest extends IntegrationTestSupport {
 		SnsType snsType = SnsType.NORMAL;
 		Role role = Role.CLIENT;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, Gender.MALE,
-			Age.TWENTIES);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, null, null);
 
 		clientRepository.save(client);
 
@@ -111,8 +107,7 @@ class AuthServiceTest extends IntegrationTestSupport {
 		SnsType snsType = SnsType.NORMAL;
 		Role role = Role.CLIENT;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, Gender.MALE,
-			Age.TWENTIES);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, null, null);
 
 		clientRepository.save(client);
 
