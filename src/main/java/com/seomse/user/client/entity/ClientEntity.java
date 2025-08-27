@@ -30,21 +30,25 @@ public class ClientEntity extends BaseTimeEntity {
 	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID id;
 
+	@Column(nullable = false, length = 50)
 	private String email;
 
+	@Column(nullable = true, length = 60)
 	private String password;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 20)
 	private SnsType snsType;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = true, length = 20)
 	private Gender gender;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = true, length = 20)
 	private Age age;
 
-	// 테스트 전용: 패키지 전용 생성자 (public 아님)
-	ClientEntity(String email, String encodedPassword, SnsType snsType, Gender gender, Age age) {
+	public ClientEntity(String email, String encodedPassword, SnsType snsType, Gender gender, Age age) {
 		this.email = email;
 		this.password = encodedPassword;
 		this.snsType = snsType;
