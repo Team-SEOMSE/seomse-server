@@ -1,15 +1,19 @@
 package com.seomse.shop.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.seomse.shop.controller.response.ShopListResponse;
 import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.enums.Type;
+import com.seomse.shop.repository.ShopQueryRepository;
 import com.seomse.shop.repository.ShopRepository;
+import com.seomse.shop.service.response.ShopDetailResponse;
+import com.seomse.shop.service.response.ShopListResponse;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class ShopService {
 
 	private final ShopRepository shopRepository;
+	private final ShopQueryRepository shopQueryRepository;
 
 	public List<ShopListResponse> getShopList(Type type) {
 		List<ShopEntity> shopList = shopRepository.findAllByShopType(type);
@@ -30,5 +35,10 @@ public class ShopService {
 				shop.getShopImage()
 			))
 			.toList();
+	}
+
+	public ShopDetailResponse getShopDetail(UUID shopId) {
+		return shopQueryRepository.findShopDetailByShopIdWithLeftJoin(shopId)
+			.orElseThrow(() -> new EntityNotFoundException("Shop not found"));
 	}
 }

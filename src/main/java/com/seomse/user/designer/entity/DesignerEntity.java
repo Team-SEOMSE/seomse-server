@@ -1,8 +1,10 @@
-package com.seomse.user.owner.entity;
+package com.seomse.user.designer.entity;
 
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
+
+import com.seomse.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,14 +16,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "owner")
+@Table(name = "designer")
 @Entity
-public class OwnerEntity {
+public class DesignerEntity extends BaseTimeEntity {
 
 	@Id
 	@UuidGenerator
-	@Column(name = "owner_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
-	private UUID ownerId;
+	@Column(name = "designer_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
+	private UUID designerId;
 
 	@Column(nullable = false, length = 50)
 	private String email;
@@ -29,8 +31,12 @@ public class OwnerEntity {
 	@Column(nullable = false, length = 60)
 	private String password;
 
-	public OwnerEntity(String email, String password) {
+	@Column(nullable = false, length = 60)
+	private String nickName;
+
+	public DesignerEntity(String email, String password, String nickName) {
 		this.email = email;
 		this.password = password;
+		this.nickName = nickName;
 	}
 }

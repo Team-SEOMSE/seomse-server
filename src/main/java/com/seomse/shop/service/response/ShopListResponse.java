@@ -1,4 +1,4 @@
-package com.seomse.shop.controller.response;
+package com.seomse.shop.service.response;
 
 import java.util.UUID;
 
