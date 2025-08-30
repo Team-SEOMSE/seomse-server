@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.seomse.common.controller.ApiResponse;
 import com.seomse.user.auth.controller.request.EmailCheckRequest;
 import com.seomse.user.auth.controller.request.LoginRequest;
+import com.seomse.user.auth.controller.request.OauthLoginRequest;
 import com.seomse.user.auth.controller.request.SignupRequest;
 import com.seomse.user.auth.service.AuthService;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
@@ -44,5 +45,11 @@ public class AuthController {
 	public ApiResponse<EmailCheckResponse> checkEmail(@Valid EmailCheckRequest request) {
 		EmailCheckResponse exists = authService.emailExists(request.toServiceRequest());
 		return ApiResponse.ok(exists);
+	}
+
+	@PostMapping("/oauth/login")
+	public ApiResponse<LoginResponse> oauthLogin(@Valid @RequestBody OauthLoginRequest request) throws
+		JsonProcessingException {
+		return ApiResponse.ok(authService.oauthLogin(request.toServiceRequest()));
 	}
 }
