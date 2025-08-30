@@ -1,11 +1,10 @@
-package com.seomse.designerShop.entity;
+package com.seomse.shop.entity;
 
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
 import com.seomse.common.entity.BaseTimeEntity;
-import com.seomse.shop.entity.ShopEntity;
 import com.seomse.user.designer.entity.DesignerEntity;
 
 import jakarta.persistence.Column;
@@ -32,8 +31,8 @@ public class DesignerShopEntity extends BaseTimeEntity {
 
 	@Id
 	@UuidGenerator
-	@Column(name = "designer_shop_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
-	private UUID designerShopId;
+	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
+	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "designer_id")

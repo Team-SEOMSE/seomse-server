@@ -1,19 +1,20 @@
 package com.seomse.shop.repository;
 
+import static com.seomse.shop.entity.QDesignerShopEntity.*;
+import static com.seomse.shop.entity.QShopEntity.*;
+import static com.seomse.user.designer.entity.QDesignerEntity.*;
+
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
-import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.seomse.designerShop.entity.QDesignerShopEntity;
-import com.seomse.shop.entity.QShopEntity;
 import com.seomse.shop.entity.ShopEntity;
-import com.seomse.shop.service.response.ShopDetailResponse;
-import com.seomse.user.designer.entity.QDesignerEntity;
+import com.seomse.shop.repository.dto.DesignerInfoDto;
+import com.seomse.shop.repository.dto.ShopDesignersDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,38 +24,30 @@ public class ShopQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public Optional<ShopDetailResponse> findShopDetailByShopIdWithLeftJoin(UUID shopId) {
-		List<Tuple> results = jpaQueryFactory
-			.select(QShopEntity.shopEntity, QDesignerEntity.designerEntity)
-			.from(QShopEntity.shopEntity)
-			.leftJoin(QDesignerShopEntity.designerShopEntity)
-			.on(QDesignerShopEntity.designerShopEntity.shop.eq(QShopEntity.shopEntity))
-			.leftJoin(QDesignerShopEntity.designerShopEntity.designer,
-				QDesignerEntity.designerEntity)
-			.where(QShopEntity.shopEntity.shopId.eq(shopId))
-			.fetch();
+	public Optional<ShopDesignersDto> findShopDetailByShopId(UUID shopId) {
+		Optional<ShopEntity> optionalShop = Optional.ofNullable(
+			jpaQueryFactory
+				.selectFrom(shopEntity)
+				.where(shopEntity.id.eq(shopId))
+				.fetchOne()
+		);
 
-		if (results.isEmpty()) {
+		if (optionalShop.isEmpty()) {
 			return Optional.empty();
 		}
 
-		ShopEntity shop = results.get(0).get(QShopEntity.shopEntity);
+		ShopEntity shop = optionalShop.get();
 
-		List<ShopDetailResponse.DesignerResponse> designerResponses = results.stream()
-			.map(tuple -> tuple.get(QDesignerEntity.designerEntity))
-			.filter(Objects::nonNull)
-			.map(designer -> new ShopDetailResponse.DesignerResponse(
-				designer.getDesignerId(),
-				designer.getNickName()
+		List<DesignerInfoDto> designerInfos = jpaQueryFactory
+			.select(Projections.constructor(DesignerInfoDto.class,
+				designerEntity.id,
+				designerEntity.nickName
 			))
-			.toList();
+			.from(designerShopEntity)
+			.join(designerShopEntity.designer, designerEntity)
+			.where(designerShopEntity.shop.id.eq(shop.getId()))
+			.fetch();
 
-		return Optional.of(new ShopDetailResponse(
-			shop.getShopType(),
-			shop.getShopName(),
-			shop.getShopInfo(),
-			shop.getShopImage(),
-			designerResponses
-		));
+		return Optional.of(new ShopDesignersDto(shop, designerInfos));
 	}
 }

@@ -25,8 +25,8 @@ public class DesignerEntity extends BaseTimeEntity {
 	@Id
 	@UuidGenerator
 	@JdbcTypeCode(SqlTypes.BINARY)
-	@Column(name = "designer_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
-	private UUID designerId;
+	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
+	private UUID id;
 
 	@Column(nullable = false, length = 50)
 	private String email;

@@ -32,8 +32,8 @@ public class ShopEntity extends BaseTimeEntity {
 	@Id
 	@UuidGenerator
 	@JdbcTypeCode(SqlTypes.BINARY)
-	@Column(name = "shop_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
-	private UUID shopId;
+	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
+	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner_id")

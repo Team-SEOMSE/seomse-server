@@ -25,8 +25,8 @@ public class OwnerEntity extends BaseTimeEntity {
 	@Id
 	@UuidGenerator
 	@JdbcTypeCode(SqlTypes.BINARY)
-	@Column(name = "owner_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
-	private UUID ownerId;
+	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
+	private UUID id;
 
 	@Column(nullable = false, length = 50)
 	private String email;
