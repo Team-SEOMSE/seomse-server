@@ -32,7 +32,7 @@ public class ShopEntity extends BaseTimeEntity {
 	@Id
 	@UuidGenerator
 	@JdbcTypeCode(SqlTypes.BINARY)
-	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
+	@Column(name = "shop_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID shopId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -52,7 +52,7 @@ public class ShopEntity extends BaseTimeEntity {
 	@Column(length = 190)
 	private String shopImage;
 
-	ShopEntity(OwnerEntity owner, Type shopType, String shopName,
+	public ShopEntity(OwnerEntity owner, Type shopType, String shopName,
 		String shopInfo, String shopImage) {
 		this.owner = owner;
 		this.shopType = shopType;
