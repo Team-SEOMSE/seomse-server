@@ -29,7 +29,7 @@ public class ClientController {
 	}
 
 	@PatchMapping("/me")
-	public ApiResponse<UUID> updateUserProfile(@RequestBody @Valid UserProfileUpdateRequest request) {
+	public ApiResponse<UUID> updateUserProfile(@Valid @RequestBody UserProfileUpdateRequest request) {
 		return ApiResponse.ok(clientService.updateUserProfile(request.toServiceRequest()));
 	}
 }
