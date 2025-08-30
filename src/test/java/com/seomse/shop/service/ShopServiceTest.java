@@ -11,11 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.seomse.IntegrationTestSupport;
-import com.seomse.designerShop.entity.DesignerShopEntity;
-import com.seomse.designerShop.repository.DesignerShopRepository;
+import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.enums.Type;
+import com.seomse.shop.repository.DesignerShopRepository;
 import com.seomse.shop.repository.ShopRepository;
+import com.seomse.shop.repository.dto.DesignerInfoDto;
 import com.seomse.shop.service.response.ShopDetailResponse;
 import com.seomse.shop.service.response.ShopListResponse;
 import com.seomse.user.designer.entity.DesignerEntity;
@@ -164,7 +165,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(new DesignerShopEntity(designer11, shop1));
 
 		//when
-		ShopDetailResponse response = shopService.getShopDetail(shop1.getShopId());
+		ShopDetailResponse response = shopService.getShopDetail(shop1.getId());
 
 		//then
 		// 샵 이름
@@ -172,7 +173,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 
 		// 디자이너 데이터 매핑
 		assertThat(response.designers()).hasSize(2)
-			.extracting(ShopDetailResponse.DesignerResponse::nickname)
+			.extracting(DesignerInfoDto::nickName)
 			.containsExactlyInAnyOrder("designerNickName10", "designerNickName11");
 	}
 
@@ -199,7 +200,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 		shopRepository.save(shop1);
 
 		// when
-		ShopDetailResponse response = shopService.getShopDetail(shop1.getShopId());
+		ShopDetailResponse response = shopService.getShopDetail(shop1.getId());
 
 		// then
 		assertThat(response.designers()).isEmpty();
@@ -211,9 +212,9 @@ class ShopServiceTest extends IntegrationTestSupport {
 		// given
 		UUID nonExistId = UUID.randomUUID();
 
-		// when + then
+		// when // then
 		assertThatThrownBy(() -> shopService.getShopDetail(nonExistId))
 			.isInstanceOf(EntityNotFoundException.class)
-			.hasMessage("Shop not found");
+			.hasMessage("Shop not found.");
 	}
 }

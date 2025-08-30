@@ -10,6 +10,7 @@ import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.enums.Type;
 import com.seomse.shop.repository.ShopQueryRepository;
 import com.seomse.shop.repository.ShopRepository;
+import com.seomse.shop.repository.dto.ShopDesignersDto;
 import com.seomse.shop.service.response.ShopDetailResponse;
 import com.seomse.shop.service.response.ShopListResponse;
 
@@ -28,7 +29,7 @@ public class ShopService {
 		List<ShopEntity> shopList = shopRepository.findAllByShopType(type);
 		return shopList.stream()
 			.map(shop -> new ShopListResponse(
-				shop.getShopId(),
+				shop.getId(),
 				shop.getShopType(),
 				shop.getShopName(),
 				shop.getShopInfo(),
@@ -38,7 +39,15 @@ public class ShopService {
 	}
 
 	public ShopDetailResponse getShopDetail(UUID shopId) {
-		return shopQueryRepository.findShopDetailByShopIdWithLeftJoin(shopId)
-			.orElseThrow(() -> new EntityNotFoundException("Shop not found"));
+		ShopDesignersDto shopDesigners = shopQueryRepository.findShopDetailByShopId(shopId)
+			.orElseThrow(() -> new EntityNotFoundException("Shop not found."));
+
+		return new ShopDetailResponse(
+			shopDesigners.shop().getShopType(),
+			shopDesigners.shop().getShopName(),
+			shopDesigners.shop().getShopInfo(),
+			shopDesigners.shop().getShopImage(),
+			shopDesigners.designers()
+		);
 	}
 }
