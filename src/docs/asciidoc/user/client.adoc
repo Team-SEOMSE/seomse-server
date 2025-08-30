@@ -1,0 +1,24 @@
+[[client-get-me]]
+=== 프로필 조회
+
+==== HTTP Request
+
+include::{snippets}/client-get-me/http-request.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/client-get-me/http-response.adoc[]
+include::{snippets}/client-get-me/response-fields.adoc[]
+
+[[client-patch-me]]
+=== 프로필 저장
+
+==== HTTP Request
+
+include::{snippets}/client-patch-me/http-request.adoc[]
+include::{snippets}/client-patch-me/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/client-patch-me/http-response.adoc[]
+include::{snippets}/client-patch-me/response-fields.adoc[]

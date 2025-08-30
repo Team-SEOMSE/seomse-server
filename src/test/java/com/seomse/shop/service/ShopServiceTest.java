@@ -59,7 +59,6 @@ class ShopServiceTest extends IntegrationTestSupport {
 		String ownerPassword1 = "abc1234!";
 
 		OwnerEntity owner1 = new OwnerEntity(ownerEmail1, ownerPassword1);
-
 		ownerRepository.save(owner1);
 
 		// shop1

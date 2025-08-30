@@ -2,7 +2,9 @@ package com.seomse.user.client.entity;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import com.seomse.common.entity.BaseTimeEntity;
 import com.seomse.user.client.enums.Age;
@@ -27,28 +29,40 @@ public class ClientEntity extends BaseTimeEntity {
 
 	@Id
 	@UuidGenerator
+	@JdbcTypeCode(SqlTypes.BINARY)
 	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID id;
 
+	@Column(nullable = false, length = 50)
 	private String email;
 
+	@Column(nullable = true, length = 60)
 	private String password;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 20)
 	private SnsType snsType;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = true, length = 20)
 	private Gender gender;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = true, length = 20)
 	private Age age;
 
-	// 테스트 전용: 패키지 전용 생성자 (public 아님)
-	ClientEntity(String email, String encodedPassword, SnsType snsType, Gender gender, Age age) {
+	public ClientEntity(String email, String encodedPassword, SnsType snsType, Gender gender, Age age) {
 		this.email = email;
 		this.password = encodedPassword;
 		this.snsType = snsType;
 		this.gender = gender;
 		this.age = age;
+	}
+
+	public ClientEntity updateProfile(Gender gender, Age age) {
+		this.gender = gender;
+		this.age = age;
+
+		return this;
 	}
 }

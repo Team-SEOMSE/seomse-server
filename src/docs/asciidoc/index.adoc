@@ -13,3 +13,8 @@ endif::[]
 == AUTH API
 
 include::user/auth.adoc[]
+
+[[Client-API]]
+== CLIENT API
+
+include::user/client.adoc[]

@@ -10,3 +10,29 @@ include::{snippets}/auth-normalLogin/request-fields.adoc[]
 
 include::{snippets}/auth-normalLogin/http-response.adoc[]
 include::{snippets}/auth-normalLogin/response-fields.adoc[]
+
+[[auth-signup]]
+=== 회원가입
+
+==== HTTP Request
+
+include::{snippets}/auth-signup/http-request.adoc[]
+include::{snippets}/auth-signup/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/auth-signup/http-response.adoc[]
+include::{snippets}/auth-signup/response-fields.adoc[]
+
+[[auth-checkEmail]]
+=== 이메일 중복 확인
+
+==== HTTP Request
+
+include::{snippets}/auth-checkEmail/http-request.adoc[]
+include::{snippets}/auth-checkEmail/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/auth-checkEmail/http-response.adoc[]
+include::{snippets}/auth-checkEmail/response-fields.adoc[]
