@@ -1,7 +1,5 @@
 package com.seomse.shop.service;
 
-import static com.seomse.shop.entity.ShopTestFactory.*;
-import static com.seomse.user.owner.entity.OwnerTestFactory.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
@@ -47,8 +45,8 @@ class ShopServiceTest extends IntegrationTestSupport {
 	@AfterEach
 	void tearDown() {
 		designerShopRepository.deleteAll();
-		designerRepository.deleteAll();
 		shopRepository.deleteAll();
+		designerRepository.deleteAll();
 		ownerRepository.deleteAll();
 	}
 
@@ -60,7 +58,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 		String ownerEmail1 = "user1@email.com";
 		String ownerPassword1 = "abc1234!";
 
-		OwnerEntity owner1 = newOwner(ownerEmail1, ownerPassword1);
+		OwnerEntity owner1 = new OwnerEntity(ownerEmail1, ownerPassword1);
 
 		ownerRepository.save(owner1);
 
@@ -70,7 +68,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 		String shopInfo1 = "info1";
 		String shopImage1 = "/img1.png";
 
-		ShopEntity shop1 = newShop(owner1, shopType1, shopName1, shopInfo1, shopImage1);
+		ShopEntity shop1 = new ShopEntity(owner1, shopType1, shopName1, shopInfo1, shopImage1);
 
 		shopRepository.save(shop1);
 
@@ -78,7 +76,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 		String ownerEmail2 = "user2@email.com";
 		String ownerPassword2 = "cba4321!";
 
-		OwnerEntity owner2 = newOwner(ownerEmail2, ownerPassword2);
+		OwnerEntity owner2 = new OwnerEntity(ownerEmail2, ownerPassword2);
 
 		ownerRepository.save(owner2);
 
@@ -88,7 +86,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 		String shopInfo2 = "info2";
 		String shopImage2 = "/img2.png";
 
-		ShopEntity shop2 = newShop(owner2, shopType2, shopName2, shopInfo2, shopImage2);
+		ShopEntity shop2 = new ShopEntity(owner2, shopType2, shopName2, shopInfo2, shopImage2);
 
 		shopRepository.save(shop2);
 

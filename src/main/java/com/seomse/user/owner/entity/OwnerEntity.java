@@ -2,7 +2,9 @@ package com.seomse.user.owner.entity;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +22,7 @@ public class OwnerEntity {
 
 	@Id
 	@UuidGenerator
+	@JdbcTypeCode(SqlTypes.BINARY)
 	@Column(name = "owner_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID ownerId;
 

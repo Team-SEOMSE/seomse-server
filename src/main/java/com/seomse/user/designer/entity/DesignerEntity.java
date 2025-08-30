@@ -2,7 +2,9 @@ package com.seomse.user.designer.entity;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import com.seomse.common.entity.BaseTimeEntity;
 
@@ -22,6 +24,7 @@ public class DesignerEntity extends BaseTimeEntity {
 
 	@Id
 	@UuidGenerator
+	@JdbcTypeCode(SqlTypes.BINARY)
 	@Column(name = "designer_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID designerId;
 
