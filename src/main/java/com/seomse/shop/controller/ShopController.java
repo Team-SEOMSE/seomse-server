@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.seomse.common.controller.ApiResponse;
-import com.seomse.shop.controller.response.ShopListResponse;
 import com.seomse.shop.enums.Type;
 import com.seomse.shop.service.ShopService;
+import com.seomse.shop.service.response.ShopListResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +23,7 @@ public class ShopController {
 
 	@GetMapping
 	public ApiResponse<List<ShopListResponse>> getShopList(
-		@RequestParam(value = "type", defaultValue = "HAIR_SALON") Type type) {
+		@RequestParam(required = true) Type type) {
 		return ApiResponse.ok(shopService.getShopList(type));
 	}
 }

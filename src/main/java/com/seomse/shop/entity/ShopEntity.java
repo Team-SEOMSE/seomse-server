@@ -49,7 +49,6 @@ public class ShopEntity extends BaseTimeEntity {
 	@Column(length = 190)
 	private String shopImage;
 
-	// 테스트 전용: 패키지 전용 생성자 (public 아님)
 	ShopEntity(OwnerEntity owner, Type shopType, String shopName,
 		String shopInfo, String shopImage) {
 		this.owner = owner;

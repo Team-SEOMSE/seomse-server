@@ -2,7 +2,11 @@ package com.seomse.user.owner.entity;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
+
+import com.seomse.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,10 +20,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "owner")
 @Entity
-public class OwnerEntity {
+public class OwnerEntity extends BaseTimeEntity {
 
 	@Id
 	@UuidGenerator
+	@JdbcTypeCode(SqlTypes.BINARY)
 	@Column(name = "owner_id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID ownerId;
 
@@ -29,7 +34,6 @@ public class OwnerEntity {
 	@Column(nullable = false, length = 60)
 	private String password;
 
-	// 테스트 전용: 패키지 전용 생성자 (public 아님)
 	OwnerEntity(String email, String password) {
 		this.email = email;
 		this.password = password;

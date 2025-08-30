@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.seomse.IntegrationTestSupport;
-import com.seomse.shop.controller.response.ShopListResponse;
 import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.enums.Type;
 import com.seomse.shop.repository.ShopRepository;
+import com.seomse.shop.service.response.ShopListResponse;
 import com.seomse.user.owner.entity.OwnerEntity;
 import com.seomse.user.owner.repository.OwnerRepository;
 

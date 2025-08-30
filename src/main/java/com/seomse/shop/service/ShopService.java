@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.seomse.shop.controller.response.ShopListResponse;
 import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.enums.Type;
 import com.seomse.shop.repository.ShopRepository;
+import com.seomse.shop.service.response.ShopListResponse;
 
 import lombok.RequiredArgsConstructor;
 
