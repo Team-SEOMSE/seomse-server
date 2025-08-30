@@ -22,8 +22,7 @@ public class ShopController {
 	private final ShopService shopService;
 
 	@GetMapping
-	public ApiResponse<List<ShopListResponse>> getShopList(
-		@RequestParam(required = true) Type type) {
+	public ApiResponse<List<ShopListResponse>> getShopList(@RequestParam Type type) {
 		return ApiResponse.ok(shopService.getShopList(type));
 	}
 }

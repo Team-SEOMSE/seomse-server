@@ -2,7 +2,9 @@ package com.seomse.shop.entity;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import com.seomse.common.entity.BaseTimeEntity;
 import com.seomse.shop.enums.Type;
@@ -29,6 +31,7 @@ public class ShopEntity extends BaseTimeEntity {
 
 	@Id
 	@UuidGenerator
+	@JdbcTypeCode(SqlTypes.BINARY)
 	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID shopId;
 
