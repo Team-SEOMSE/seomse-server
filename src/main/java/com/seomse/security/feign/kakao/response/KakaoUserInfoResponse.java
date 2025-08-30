@@ -42,15 +42,12 @@ public class KakaoUserInfoResponse {
 			this.isEmailVerified = isEmailVerified;
 			this.email = email;
 		}
+
 	}
 
 	public KakaoUserInfoResponse(long id, String connectedAt, KakaoAccount kakaoAccount) {
 		this.id = id;
 		this.connectedAt = connectedAt;
 		this.kakaoAccount = kakaoAccount;
-	}
-
-	public String getEmail() {
-		return kakaoAccount.email;
 	}
 }

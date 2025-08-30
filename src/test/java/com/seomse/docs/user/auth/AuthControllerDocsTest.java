@@ -23,11 +23,13 @@ import com.seomse.docs.RestDocsSupport;
 import com.seomse.user.auth.controller.AuthController;
 import com.seomse.user.auth.controller.request.EmailCheckRequest;
 import com.seomse.user.auth.controller.request.LoginRequest;
+import com.seomse.user.auth.controller.request.OauthLoginRequest;
 import com.seomse.user.auth.controller.request.SignupRequest;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.auth.service.AuthService;
 import com.seomse.user.auth.service.request.EmailCheckServiceRequest;
 import com.seomse.user.auth.service.request.LoginServiceRequest;
+import com.seomse.user.auth.service.request.OauthLoginServiceRequest;
 import com.seomse.user.auth.service.request.SignupServiceRequest;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
 import com.seomse.user.auth.service.response.LoginResponse;
@@ -74,6 +76,48 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 						.description("비밀번호"),
 					fieldWithPath("role").type(JsonFieldType.STRING)
 						.description("로그인한 유저의 역할. 가능한 값: " + Arrays.toString(Role.values()))
+				),
+				responseFields(
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
+						.description("코드"),
+					fieldWithPath("data").type(JsonFieldType.OBJECT)
+						.description("응답 데이터"),
+					fieldWithPath("data.accessToken").type(JsonFieldType.STRING)
+						.description("인증 토큰")
+				)
+			));
+	}
+
+	@DisplayName("카카오 로그인 API")
+	@Test
+	void oauthLogin() throws Exception {
+		// given
+		OauthLoginRequest request = new OauthLoginRequest("ADFDAFS", SnsType.KAKAO);
+
+		given(authService.oauthLogin(any(OauthLoginServiceRequest.class)))
+			.willReturn(new LoginResponse(
+				"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VySWRcIjpcImY4MWQ0ZmFlLTdkZWMtMTFkMC1hNzY1LTAwYTBjO"
+					+ "TFlNmJmNlwiLFwicm9sZVwiOlwiQ0xJRU5UXCJ9IiwiZXhwIjoxNzU1OTY3MTA4LCJVVUlEIjoiOTdhOWRlMWItNGFiNS00"
+					+ "N2E1LWJkMDktMTc5MGUxMDc4NWY1In0.Fz9O6EfhonoWspVddRofnw7IoXCmkXrgseSCZajMU1-OqYXxq82I_U1x9Xfgc9z"
+					+ "cYv-pHLKMTJXGqoTegWuN4A")
+			);
+
+		// when // then
+		mockMvc.perform(
+				post("/user/auth/oauth/login")
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+			)
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andDo(document("auth-oauthLogin",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("code").type(JsonFieldType.STRING)
+						.description("카카오 API에서 반환된 Code"),
+					fieldWithPath("snsType").type(JsonFieldType.STRING)
+						.description("가입하는 sns 유형. 가능한 값: " + Arrays.toString(SnsType.values()))
 				),
 				responseFields(
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
