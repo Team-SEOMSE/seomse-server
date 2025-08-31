@@ -11,6 +11,19 @@ include::{snippets}/auth-normalLogin/request-fields.adoc[]
 include::{snippets}/auth-normalLogin/http-response.adoc[]
 include::{snippets}/auth-normalLogin/response-fields.adoc[]
 
+[[auth-oauthLogin]]
+=== SNS 로그인
+
+==== HTTP Request
+
+include::{snippets}/auth-oauthLogin/http-request.adoc[]
+include::{snippets}/auth-oauthLogin/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/auth-oauthLogin/http-response.adoc[]
+include::{snippets}/auth-oauthLogin/response-fields.adoc[]
+
 [[auth-signup]]
 === 회원가입
 

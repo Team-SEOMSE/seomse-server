@@ -51,10 +51,10 @@ public class AppointmentService {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
 
 		ClientEntity client = clientRepository.findById(loginUser.userId())
-			.orElseThrow(() -> new RuntimeException("User not found."));
+			.orElseThrow(() -> new IllegalArgumentException("User not found."));
 
 		DesignerShopEntity designerShop = designerShopRepository.findByDesignerId(request.designerId())
-			.orElseThrow(() -> new RuntimeException("DesignerShop not found."));
+			.orElseThrow(() -> new IllegalArgumentException("DesignerShop not found."));
 
 		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, request.serviceName());
 

@@ -24,7 +24,7 @@ public class KakaoApiClient implements OAuthApiClient {
 	public String getEmail(String accessToken) {
 		// 이메일은 권한이 없기 때문에 ID로 대체
 		Long id = kakaoApiFeignCall.getUserInfo("Bearer " + accessToken).getId();
-		return String.valueOf(id);
+		return id + "@daum.net";
 	}
 
 	@Override
