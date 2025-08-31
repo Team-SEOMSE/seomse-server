@@ -24,7 +24,6 @@ import com.seomse.interaction.appointment.enums.HairTreatmentType;
 import com.seomse.interaction.appointment.enums.HairType;
 import com.seomse.interaction.appointment.enums.ScaleType;
 import com.seomse.interaction.appointment.repository.AppointmentDetailRepository;
-import com.seomse.interaction.appointment.repository.AppointmentQueryRepository;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
@@ -71,9 +70,6 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private AppointmentRepository appointmentRepository;
-
-	@Autowired
-	private AppointmentQueryRepository appointmentQueryRepository;
 
 	@Autowired
 	private AppointmentDetailRepository appointmentDetailRepository;
