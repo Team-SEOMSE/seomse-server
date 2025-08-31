@@ -103,13 +103,15 @@ public class AuthService {
 	public LoginResponse oauthLogin(OauthLoginServiceRequest request) throws JsonProcessingException {
 		OAuthApiClient client = clients.get(request.snsType());
 		String accessToken = client.getToken(kakaoClientId, kakaoRedirectUri, request.code(), kakaoClientSecret);
-
 		String email = client.getEmail(accessToken);
 
-		ClientEntity newClient = new ClientEntity(email, null, request.snsType(), null, null);
-		ClientEntity savedClient = clientRepository.save(newClient);
-
-		LoginUserInfo userInfo = new LoginUserInfo(savedClient.getId(), Role.CLIENT);
+		ClientEntity clientEntity = clientRepository.findByEmail(email)
+			.orElseGet(() -> {
+				ClientEntity newClient = new ClientEntity(email, null, request.snsType(), null, null);
+				return clientRepository.save(newClient);
+			});
+		
+		LoginUserInfo userInfo = new LoginUserInfo(clientEntity.getId(), Role.CLIENT);
 		JwtToken jwtToken = jwtTokenGenerator.generate(userInfo);
 
 		return new LoginResponse(jwtToken.accessToken());
