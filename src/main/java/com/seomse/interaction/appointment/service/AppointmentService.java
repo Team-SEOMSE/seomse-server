@@ -21,12 +21,9 @@ import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.security.service.SecurityService;
 import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.repository.DesignerShopRepository;
-import com.seomse.shop.repository.ShopRepository;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.client.entity.ClientEntity;
 import com.seomse.user.client.repository.ClientRepository;
-import com.seomse.user.designer.repository.DesignerRepository;
-import com.seomse.user.owner.repository.OwnerRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,9 +38,6 @@ public class AppointmentService {
 	private final DesignerShopRepository designerShopRepository;
 	private final AppointmentRepository appointmentRepository;
 	private final AppointmentDetailRepository appointmentDetailRepository;
-	private final DesignerRepository designerRepository;
-	private final ShopRepository shopRepository;
-	private final OwnerRepository ownerRepository;
 	private final AppointmentQueryRepository appointmentQueryRepository;
 
 	public UUID createAppointment(AppointmentCreateRequest request,
