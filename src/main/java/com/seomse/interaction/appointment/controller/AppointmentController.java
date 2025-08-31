@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.seomse.common.controller.ApiResponse;
 import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
 import com.seomse.interaction.appointment.service.AppointmentService;
+import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
 
 import jakarta.validation.Valid;
@@ -40,4 +42,8 @@ public class AppointmentController {
 		return ApiResponse.ok(appointmentService.getAppointmentList());
 	}
 
+	@GetMapping("/{appointmentId}/details")
+	public ApiResponse<AppointmentDetailResponse> getAppointment(@PathVariable UUID appointmentId) {
+		return ApiResponse.ok(appointmentService.getAppointment(appointmentId));
+	}
 }

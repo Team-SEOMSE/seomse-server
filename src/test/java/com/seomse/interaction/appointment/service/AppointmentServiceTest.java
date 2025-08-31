@@ -1,10 +1,9 @@
 package com.seomse.interaction.appointment.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +27,7 @@ import com.seomse.interaction.appointment.enums.ScaleType;
 import com.seomse.interaction.appointment.repository.AppointmentDetailRepository;
 import com.seomse.interaction.appointment.repository.AppointmentQueryRepository;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
+import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
 import com.seomse.s3.service.S3Service;
 import com.seomse.security.jwt.dto.LoginUserInfo;
@@ -74,7 +74,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private AppointmentRepository appointmentRepository;
 
-	@MockitoBean
+	@Autowired
 	private AppointmentQueryRepository appointmentQueryRepository;
 
 	@Autowired
@@ -328,92 +328,206 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnClientAppointmentList() {
 		//given
-		UUID fakeClientId = UUID.randomUUID();
+		// Owner
+		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		ownerRepository.save(owner);
 
-		LoginUserInfo loginUser = new LoginUserInfo(fakeClientId, Role.CLIENT);
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(loginUser);
+		// Shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
 
-		// response
-		UUID appointmentId = UUID.randomUUID();
-		String shopName = "shopName";
-		String designerNickname = "designerNickName";
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// DesignerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		// appointment
 		String serviceName = "serviceName";
-		LocalDateTime appointmentDate = LocalDateTime.now();
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
 
-		List<AppointmentListResponse> expected = List.of(
-			new AppointmentListResponse(appointmentId, shopName, designerNickname, serviceName, appointmentDate));
-		when(appointmentQueryRepository.findAppointmentListByClientId(fakeClientId)).thenReturn(expected);
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
 
 		//when
 		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
 
 		//then
-		// response
-		assertThat(appointmentList).isEqualTo(expected);
-		// method
-		verify(appointmentQueryRepository).findAppointmentListByClientId(fakeClientId);
-		verifyNoMoreInteractions(appointmentQueryRepository);
+		assertThat(appointmentList).hasSize(1);
+		assertThat(appointmentList.get(0).appointmentId()).isEqualTo(appointment.getId());
+		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName1");
+		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName10");
+		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
+		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
 	}
 
 	@DisplayName("예약 전체 조회 시 Owner 예약을 반환한다.")
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnOwnerAppointmentList() {
 		//given
-		UUID fakeOwnerId = UUID.randomUUID();
+		// Owner
+		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		ownerRepository.save(owner);
 
-		LoginUserInfo loginUser = new LoginUserInfo(fakeOwnerId, Role.OWNER);
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(loginUser);
+		// Shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
 
-		// response
-		UUID appointmentId = UUID.randomUUID();
-		String shopName = "shopName";
-		String designerNickname = "designerNickName";
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// DesignerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		// appointment
 		String serviceName = "serviceName";
-		LocalDateTime appointmentDate = LocalDateTime.now();
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
 
-		List<AppointmentListResponse> expected = List.of(
-			new AppointmentListResponse(appointmentId, shopName, designerNickname, serviceName, appointmentDate));
-		when(appointmentQueryRepository.findAppointmentListByOwnerId(fakeOwnerId)).thenReturn(expected);
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(owner.getId(), Role.OWNER);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
 
 		//when
 		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
 
 		//then
 		// response
-		assertThat(appointmentList).isEqualTo(expected);
-		// method
-		verify(appointmentQueryRepository).findAppointmentListByOwnerId(fakeOwnerId);
-		verifyNoMoreInteractions(appointmentQueryRepository);
+		assertThat(appointmentList).hasSize(1);
+		assertThat(appointmentList.get(0).appointmentId()).isEqualTo(appointment.getId());
+		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName1");
+		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName10");
+		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
+		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
 	}
 
 	@DisplayName("예약 전체 조회 시 Designer 예약을 반환한다.")
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnDesignerAppointmentList() {
 		//given
-		UUID fakeDesignerId = UUID.randomUUID();
+		// Owner
+		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		ownerRepository.save(owner);
 
-		LoginUserInfo loginUser = new LoginUserInfo(fakeDesignerId, Role.DESIGNER);
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(loginUser);
+		// Shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
 
-		// response
-		UUID appointmentId = UUID.randomUUID();
-		String shopName = "shopName";
-		String designerNickname = "designerNickName";
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// DesignerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		// appointment
 		String serviceName = "serviceName";
-		LocalDateTime appointmentDate = LocalDateTime.now();
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
 
-		List<AppointmentListResponse> expected = List.of(
-			new AppointmentListResponse(appointmentId, shopName, designerNickname, serviceName, appointmentDate));
-		when(appointmentQueryRepository.findAppointmentListByDesignerId(fakeDesignerId)).thenReturn(expected);
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.DESIGNER);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
 
 		//when
 		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
 
 		//then
 		// response
-		assertThat(appointmentList).isEqualTo(expected);
-		// method
-		verify(appointmentQueryRepository).findAppointmentListByDesignerId(fakeDesignerId);
-		verifyNoMoreInteractions(appointmentQueryRepository);
+		assertThat(appointmentList).hasSize(1);
+		assertThat(appointmentList.get(0).appointmentId()).isEqualTo(appointment.getId());
+		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName1");
+		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName10");
+		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
+		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
 	}
+
+	@DisplayName("예약 상세 조회에 성공하면 AppointmentDetailResponse를 반환한다.")
+	@Test
+	void givenValidAppointmentId_whenGetAppointment_thenReturnDetailResponse() {
+		// given
+		// owner
+		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		// appointment
+		String serviceName = "serviceName";
+
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
+
+		// appointmentDetail
+		ScaleType scaleType = ScaleType.DRY;
+		HairType hairType = HairType.CURLY;
+		HairLength hairLength = HairLength.MEDIUM;
+		HairTreatmentType hairTreatmentType = HairTreatmentType.BLEACH;
+		String requirements = "requirements";
+		String requirementsImage = "/image.png";
+
+		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, scaleType, hairType,
+			hairLength, hairTreatmentType, requirements, requirementsImage);
+		appointmentDetailRepository.save(appointmentDetail);
+
+		UUID appointmentId = appointmentDetail.getAppointment().getId();
+
+		// when
+		AppointmentDetailResponse response = appointmentService.getAppointment(appointmentId);
+
+		// then
+		assertThat(response.scaleType()).isEqualTo(appointmentDetail.getScaleType());
+		assertThat(response.hairType()).isEqualTo(appointmentDetail.getHairType());
+		assertThat(response.hairLength()).isEqualTo(appointmentDetail.getHairLength());
+		assertThat(response.hairTreatmentType()).isEqualTo(appointmentDetail.getHairTreatmentType());
+		assertThat(response.requirements()).isEqualTo(appointmentDetail.getRequirements());
+		assertThat(response.requirementsImage()).isEqualTo(appointmentDetail.getRequirementsImage());
+	}
+
+	@DisplayName("예약 상세 조회에 실패하면 IllegalArgumentException이 발생한다.")
+	@Test
+	void givenInvalidAppointmentId_whenGetAppointment_thenThrowException() {
+		// given
+		UUID invalidAppointmentId = UUID.randomUUID();
+
+		// when & then
+		assertThatThrownBy(() -> appointmentService.getAppointment(invalidAppointmentId))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("Appointment not found.");
+	}
+
 }

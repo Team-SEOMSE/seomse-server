@@ -14,18 +14,16 @@ import com.seomse.interaction.appointment.entity.AppointmentEntity;
 import com.seomse.interaction.appointment.repository.AppointmentDetailRepository;
 import com.seomse.interaction.appointment.repository.AppointmentQueryRepository;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
+import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
 import com.seomse.s3.service.S3Service;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.security.service.SecurityService;
 import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.repository.DesignerShopRepository;
-import com.seomse.shop.repository.ShopRepository;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.client.entity.ClientEntity;
 import com.seomse.user.client.repository.ClientRepository;
-import com.seomse.user.designer.repository.DesignerRepository;
-import com.seomse.user.owner.repository.OwnerRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,9 +38,6 @@ public class AppointmentService {
 	private final DesignerShopRepository designerShopRepository;
 	private final AppointmentRepository appointmentRepository;
 	private final AppointmentDetailRepository appointmentDetailRepository;
-	private final DesignerRepository designerRepository;
-	private final ShopRepository shopRepository;
-	private final OwnerRepository ownerRepository;
 	private final AppointmentQueryRepository appointmentQueryRepository;
 
 	public UUID createAppointment(AppointmentCreateRequest request,
@@ -93,5 +88,10 @@ public class AppointmentService {
 			}
 			default -> throw new IllegalStateException("Unsupported role.");
 		}
+	}
+
+	public AppointmentDetailResponse getAppointment(UUID appointmentId) {
+		return appointmentQueryRepository.findAppointmentDetail(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
 	}
 }
