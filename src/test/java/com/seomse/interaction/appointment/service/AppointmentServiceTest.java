@@ -4,6 +4,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +26,9 @@ import com.seomse.interaction.appointment.enums.HairTreatmentType;
 import com.seomse.interaction.appointment.enums.HairType;
 import com.seomse.interaction.appointment.enums.ScaleType;
 import com.seomse.interaction.appointment.repository.AppointmentDetailRepository;
+import com.seomse.interaction.appointment.repository.AppointmentQueryRepository;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
+import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
 import com.seomse.s3.service.S3Service;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.shop.entity.DesignerShopEntity;
@@ -69,6 +73,9 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private AppointmentRepository appointmentRepository;
+
+	@MockitoBean
+	private AppointmentQueryRepository appointmentQueryRepository;
 
 	@Autowired
 	private AppointmentDetailRepository appointmentDetailRepository;
@@ -317,4 +324,96 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			.hasMessage("DesignerShop not found.");
 	}
 
+	@DisplayName("예약 전체 조회 시 Client 예약을 반환한다.")
+	@Test
+	void givenValidRequest_whenGetAppointmentList_thenReturnClientAppointmentList() {
+		//given
+		UUID fakeClientId = UUID.randomUUID();
+
+		LoginUserInfo loginUser = new LoginUserInfo(fakeClientId, Role.CLIENT);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(loginUser);
+
+		// response
+		UUID appointmentId = UUID.randomUUID();
+		String shopName = "shopName";
+		String designerNickname = "designerNickName";
+		String serviceName = "serviceName";
+		LocalDateTime appointmentDate = LocalDateTime.now();
+
+		List<AppointmentListResponse> expected = List.of(
+			new AppointmentListResponse(appointmentId, shopName, designerNickname, serviceName, appointmentDate));
+		when(appointmentQueryRepository.findAppointmentListByClientId(fakeClientId)).thenReturn(expected);
+
+		//when
+		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
+
+		//then
+		// response
+		assertThat(appointmentList).isEqualTo(expected);
+		// method
+		verify(appointmentQueryRepository).findAppointmentListByClientId(fakeClientId);
+		verifyNoMoreInteractions(appointmentQueryRepository);
+	}
+
+	@DisplayName("예약 전체 조회 시 Owner 예약을 반환한다.")
+	@Test
+	void givenValidRequest_whenGetAppointmentList_thenReturnOwnerAppointmentList() {
+		//given
+		UUID fakeOwnerId = UUID.randomUUID();
+
+		LoginUserInfo loginUser = new LoginUserInfo(fakeOwnerId, Role.OWNER);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(loginUser);
+
+		// response
+		UUID appointmentId = UUID.randomUUID();
+		String shopName = "shopName";
+		String designerNickname = "designerNickName";
+		String serviceName = "serviceName";
+		LocalDateTime appointmentDate = LocalDateTime.now();
+
+		List<AppointmentListResponse> expected = List.of(
+			new AppointmentListResponse(appointmentId, shopName, designerNickname, serviceName, appointmentDate));
+		when(appointmentQueryRepository.findAppointmentListByOwnerId(fakeOwnerId)).thenReturn(expected);
+
+		//when
+		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
+
+		//then
+		// response
+		assertThat(appointmentList).isEqualTo(expected);
+		// method
+		verify(appointmentQueryRepository).findAppointmentListByOwnerId(fakeOwnerId);
+		verifyNoMoreInteractions(appointmentQueryRepository);
+	}
+
+	@DisplayName("예약 전체 조회 시 Designer 예약을 반환한다.")
+	@Test
+	void givenValidRequest_whenGetAppointmentList_thenReturnDesignerAppointmentList() {
+		//given
+		UUID fakeDesignerId = UUID.randomUUID();
+
+		LoginUserInfo loginUser = new LoginUserInfo(fakeDesignerId, Role.DESIGNER);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(loginUser);
+
+		// response
+		UUID appointmentId = UUID.randomUUID();
+		String shopName = "shopName";
+		String designerNickname = "designerNickName";
+		String serviceName = "serviceName";
+		LocalDateTime appointmentDate = LocalDateTime.now();
+
+		List<AppointmentListResponse> expected = List.of(
+			new AppointmentListResponse(appointmentId, shopName, designerNickname, serviceName, appointmentDate));
+		when(appointmentQueryRepository.findAppointmentListByDesignerId(fakeDesignerId)).thenReturn(expected);
+
+		//when
+		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
+
+		//then
+		// response
+		assertThat(appointmentList).isEqualTo(expected);
+		// method
+		verify(appointmentQueryRepository).findAppointmentListByDesignerId(fakeDesignerId);
+		verifyNoMoreInteractions(appointmentQueryRepository);
+	}
 }
