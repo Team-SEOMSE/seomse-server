@@ -3,6 +3,7 @@ package com.seomse.interaction.review.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -17,7 +18,9 @@ import com.seomse.interaction.appointment.entity.AppointmentEntity;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.review.controller.request.ReviewCreateRequest;
 import com.seomse.interaction.review.entity.ReviewEntity;
+import com.seomse.interaction.review.repository.ReviewQueryRepository;
 import com.seomse.interaction.review.repository.ReviewRepository;
+import com.seomse.interaction.review.service.response.ReviewListResponse;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.entity.ShopEntity;
@@ -65,6 +68,9 @@ class ReviewServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private ReviewRepository reviewRepository;
 
+	@Autowired
+	private ReviewQueryRepository reviewQueryRepository;
+
 	void createReview() {
 		reviewRepository.deleteAll();
 		appointmentRepository.deleteAll();
@@ -73,7 +79,6 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		shopRepository.deleteAll();
 		ownerRepository.deleteAll();
 		clientRepository.deleteAll();
-
 	}
 
 	@DisplayName("리뷰 생성 시, appointmentId로 리뷰가 저장되고 reviewId를 반환한다. (이미지 없음)")
@@ -97,8 +102,13 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
-			SnsType.NORMAL, null, null);
+		String email = "user@email.com";
+		String password = "abc1234!";
+		String name = "김섬세";
+		SnsType snsType = SnsType.NORMAL;
+
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
 		clientRepository.save(client);
 
 		// appointment
@@ -147,8 +157,13 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
-			SnsType.NORMAL, null, null);
+		String email = "user@email.com";
+		String password = "abc1234!";
+		String name = "김섬세";
+		SnsType snsType = SnsType.NORMAL;
+
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
 		clientRepository.save(client);
 
 		// appointment
@@ -218,8 +233,13 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
-			SnsType.NORMAL, null, null);
+		String email = "user@email.com";
+		String password = "abc1234!";
+		String name = "김섬세";
+		SnsType snsType = SnsType.NORMAL;
+
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
 		clientRepository.save(client);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -238,6 +258,123 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		assertThatThrownBy(() -> reviewService.createReview(request, null))
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("Appointment not found");
+	}
+
+	@DisplayName("Role이 OWNER일 경우, ownerId 기준으로 리뷰 목록을 반환한다.")
+	@Test
+	void givenOwnerRole_whenGetReviewList_thenReturnReviewsByOwner() {
+		//given
+		// owner
+		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		String email = "user@email.com";
+		String password = "abc1234!";
+		String name = "김섬세";
+		SnsType snsType = SnsType.NORMAL;
+
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
+		clientRepository.save(client);
+
+		// appointment
+		String serviceName = "serviceName";
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
+
+		// review
+		String reviewRating = "5";
+		String reviewContent = "reviewContent";
+		String image = "/img.png";
+		ReviewEntity review = new ReviewEntity(appointment, reviewRating, reviewContent, image);
+		reviewRepository.save(review);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(owner.getId(), Role.OWNER);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		//when
+		List<ReviewListResponse> reviewList = reviewService.getReviewList();
+
+		//then
+		assertThat(reviewList).hasSize(1);
+		assertThat(reviewList.get(0).reviewRating()).isEqualTo("5");
+		assertThat(reviewList.get(0).reviewContent()).isEqualTo("reviewContent");
+		assertThat(reviewList.get(0).reviewImage()).isEqualTo("/img.png");
+		assertThat(reviewList.get(0).shopName()).isEqualTo("shopName1");
+		assertThat(reviewList.get(0).designerNickName()).isEqualTo("designerNickName10");
+		assertThat(reviewList.get(0).serviceName()).isEqualTo("serviceName");
+	}
+
+	@DisplayName("Role이 DESIGNER일 경우, designerId 기준으로 리뷰 목록을 반환한다.")
+	@Test
+	void givenDesignerRole_whenGetReviewList_thenReturnReviewsByDesigner() {
+		// owner
+		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		String email = "user@email.com";
+		String password = "abc1234!";
+		String name = "김섬세";
+		SnsType snsType = SnsType.NORMAL;
+
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
+		clientRepository.save(client);
+
+		// appointment
+		String serviceName = "serviceName";
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
+
+		// review
+		String reviewRating = "5";
+		String reviewContent = "reviewContent";
+		String image = "/img.png";
+		ReviewEntity review = new ReviewEntity(appointment, reviewRating, reviewContent, image);
+		reviewRepository.save(review);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.DESIGNER);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		//when
+		List<ReviewListResponse> reviewList = reviewService.getReviewList();
+
+		//then
+		assertThat(reviewList).hasSize(1);
+		assertThat(reviewList.get(0).reviewRating()).isEqualTo("5");
+		assertThat(reviewList.get(0).reviewContent()).isEqualTo("reviewContent");
+		assertThat(reviewList.get(0).reviewImage()).isEqualTo("/img.png");
+		assertThat(reviewList.get(0).shopName()).isEqualTo("shopName1");
+		assertThat(reviewList.get(0).designerNickName()).isEqualTo("designerNickName10");
+		assertThat(reviewList.get(0).serviceName()).isEqualTo("serviceName");
 	}
 
 }

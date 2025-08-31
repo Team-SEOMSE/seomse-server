@@ -1,6 +1,7 @@
 package com.seomse.interaction.review.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -11,10 +12,13 @@ import com.seomse.interaction.appointment.entity.AppointmentEntity;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.review.controller.request.ReviewCreateRequest;
 import com.seomse.interaction.review.entity.ReviewEntity;
+import com.seomse.interaction.review.repository.ReviewQueryRepository;
 import com.seomse.interaction.review.repository.ReviewRepository;
+import com.seomse.interaction.review.service.response.ReviewListResponse;
 import com.seomse.s3.service.S3Service;
+import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.security.service.SecurityService;
-import com.seomse.user.client.repository.ClientRepository;
+import com.seomse.user.auth.enums.Role;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,9 +29,9 @@ public class ReviewService {
 
 	private final SecurityService securityService;
 	private final S3Service s3Service;
-	private final ClientRepository clientRepository;
 	private final AppointmentRepository appointmentRepository;
 	private final ReviewRepository reviewRepository;
+	private final ReviewQueryRepository reviewQueryRepository;
 
 	public UUID createReview(ReviewCreateRequest request,
 		MultipartFile reviewImage) {
@@ -48,5 +52,21 @@ public class ReviewService {
 		reviewRepository.save(review);
 
 		return review.getId();
+	}
+
+	public List<ReviewListResponse> getReviewList() {
+		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
+		Role role = loginUser.role();
+
+		// 디자이너, 점주
+		switch (role) {
+			case OWNER -> {
+				return reviewQueryRepository.findReviewListByOwner(loginUser.userId());
+			}
+			case DESIGNER -> {
+				return reviewQueryRepository.findReviewListByDesigner(loginUser.userId());
+			}
+			default -> throw new IllegalStateException("Unsupported role.");
+		}
 	}
 }
