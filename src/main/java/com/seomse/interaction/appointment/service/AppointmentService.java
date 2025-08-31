@@ -100,4 +100,10 @@ public class AppointmentService {
 		return appointmentQueryRepository.findAppointmentDetail(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
 	}
+
+	public AppointmentDetailResponse getAppointmentByLatest() {
+		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
+		return appointmentQueryRepository.findAppointmentDetailByLatest(loginUser.userId())
+			.orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
+	}
 }

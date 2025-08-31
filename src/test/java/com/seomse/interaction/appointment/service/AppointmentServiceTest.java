@@ -530,4 +530,78 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			.hasMessage("Appointment not found.");
 	}
 
+	@DisplayName("예약 최신 상세 조회에 성공하면 최신의 AppointmentDetailResponse를 하나 반환한다.")
+	@Test
+	void givenValidAppointmentId_whenGetLatestAppointment_thenReturnLatestDetailResponse() {
+		// given
+		// owner
+		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+
+		// appointment
+		String serviceName = "serviceName";
+
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
+
+		// appointmentDetail
+		ScaleType scaleType = ScaleType.DRY;
+		HairType hairType = HairType.CURLY;
+		HairLength hairLength = HairLength.MEDIUM;
+		HairTreatmentType hairTreatmentType = HairTreatmentType.BLEACH;
+		String requirements = "requirements";
+		String requirementsImage = "/image.png";
+
+		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, scaleType, hairType,
+			hairLength, hairTreatmentType, requirements, requirementsImage);
+		appointmentDetailRepository.save(appointmentDetail);
+
+		// when
+		AppointmentDetailResponse response = appointmentService.getAppointmentByLatest();
+
+		// then
+		assertThat(response.scaleType()).isEqualTo(appointmentDetail.getScaleType());
+		assertThat(response.hairType()).isEqualTo(appointmentDetail.getHairType());
+		assertThat(response.hairLength()).isEqualTo(appointmentDetail.getHairLength());
+		assertThat(response.hairTreatmentType()).isEqualTo(appointmentDetail.getHairTreatmentType());
+		assertThat(response.requirements()).isEqualTo(appointmentDetail.getRequirements());
+		assertThat(response.requirementsImage()).isEqualTo(appointmentDetail.getRequirementsImage());
+	}
+
+	@DisplayName("예약 최신 상세 조회에 실패하면 IllegalArgumentException이 발생한다.")
+	@Test
+	void givenInvalidAppointmentId_whenGetLatestAppointment_thenThrowException() {
+		// given
+		ClientEntity client = new ClientEntity("nouser@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+
+		// when & then
+		assertThatThrownBy(() -> appointmentService.getAppointmentByLatest())
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("Appointment not found.");
+	}
 }

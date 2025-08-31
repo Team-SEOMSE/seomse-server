@@ -43,4 +43,9 @@ public class AppointmentController {
 	public ApiResponse<AppointmentDetailResponse> getAppointment(@PathVariable UUID appointmentId) {
 		return ApiResponse.ok(appointmentService.getAppointment(appointmentId));
 	}
+
+	@GetMapping("/details")
+	public ApiResponse<AppointmentDetailResponse> getAppointmentByLatest() {
+		return ApiResponse.ok(appointmentService.getAppointmentByLatest());
+	}
 }
