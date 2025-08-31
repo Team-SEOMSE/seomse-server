@@ -1,11 +1,12 @@
 package com.seomse.interaction.appointment.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.seomse.IntegrationTestSupport;
 import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
@@ -29,7 +28,6 @@ import com.seomse.interaction.appointment.repository.AppointmentQueryRepository;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
-import com.seomse.s3.service.S3Service;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.entity.ShopEntity;
@@ -45,13 +43,13 @@ import com.seomse.user.designer.repository.DesignerRepository;
 import com.seomse.user.owner.entity.OwnerEntity;
 import com.seomse.user.owner.repository.OwnerRepository;
 
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+
 class AppointmentServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private AppointmentService appointmentService;
-
-	@MockitoBean
-	private S3Service s3Service;
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -118,7 +116,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
 
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		// request
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
@@ -132,16 +130,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			"말 걸지 말아주세요."
 		);
 
-		// requirementsImage
-		MockMultipartFile fakeRequirementsImage = new MockMultipartFile(
-			"requirementsImage",
-			"test.png",
-			"image/png",
-			"bytes".getBytes()
-		);
-
 		// when
-		UUID appointmentId = appointmentService.createAppointment(request, fakeRequirementsImage);
+		UUID appointmentId = appointmentService.createAppointment(request, null);
 
 		// then
 		// appointment
@@ -188,7 +178,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
 
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		// request
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
@@ -202,6 +192,12 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			"말 걸지 말아주세요."
 		);
 
+		// S3Client
+		given(s3Client.putObject(
+			any(Consumer.class),
+			any(RequestBody.class)
+		)).willReturn(PutObjectResponse.builder().build());
+
 		// requirementsImage
 		MockMultipartFile fakeRequirementsImage = new MockMultipartFile(
 			"requirementsImage",
@@ -209,9 +205,6 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			"image/png",
 			"fake image".getBytes()
 		);
-
-		String expectedS3Key = "/images.png";
-		when(s3Service.upload(any(MultipartFile.class))).thenReturn(expectedS3Key);
 
 		// when
 		// appointment
@@ -234,8 +227,12 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentDetail.getHairTreatmentType()).isEqualTo(HairTreatmentType.BLEACH);
 
 		// s3key
-		assertThat(appointmentDetail.getRequirementsImage()).isEqualTo(expectedS3Key);
-		verify(s3Service, times(1)).upload(fakeRequirementsImage);
+		assertThat(appointmentDetail.getRequirementsImage()).isNotNull();
+		assertThat(appointmentDetail.getRequirementsImage()).endsWith(".png");
+		verify(s3Client, times(1)).putObject(
+			any(Consumer.class),
+			any(RequestBody.class)
+		);
 	}
 
 	@DisplayName("존재하지 않는 Client ID로 예약을 생성하면 예외가 발생한다.")
@@ -261,7 +258,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		// client
 		UUID nonExistClientId = UUID.randomUUID();
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(nonExistClientId, Role.CLIENT);
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		//request
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
@@ -304,7 +301,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
 
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		//request
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
@@ -355,7 +352,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		//when
 		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
@@ -400,7 +397,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(owner.getId(), Role.OWNER);
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		//when
 		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
@@ -446,7 +443,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.DESIGNER);
-		when(securityService.getCurrentLoginUserInfo()).thenReturn(fakeLoginUser);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		//when
 		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
@@ -530,4 +527,78 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			.hasMessage("Appointment not found.");
 	}
 
+	@DisplayName("예약 최신 상세 조회에 성공하면 최신의 AppointmentDetailResponse를 하나 반환한다.")
+	@Test
+	void givenValidAppointmentId_whenGetLatestAppointment_thenReturnLatestDetailResponse() {
+		// given
+		// owner
+		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		// appointment
+		String serviceName = "serviceName";
+
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		appointmentRepository.save(appointment);
+
+		// appointmentDetail
+		ScaleType scaleType = ScaleType.DRY;
+		HairType hairType = HairType.CURLY;
+		HairLength hairLength = HairLength.MEDIUM;
+		HairTreatmentType hairTreatmentType = HairTreatmentType.BLEACH;
+		String requirements = "requirements";
+		String requirementsImage = "/image.png";
+
+		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, scaleType, hairType,
+			hairLength, hairTreatmentType, requirements, requirementsImage);
+		appointmentDetailRepository.save(appointmentDetail);
+
+		// when
+		AppointmentDetailResponse response = appointmentService.getAppointmentByLatest();
+
+		// then
+		assertThat(response.scaleType()).isEqualTo(appointmentDetail.getScaleType());
+		assertThat(response.hairType()).isEqualTo(appointmentDetail.getHairType());
+		assertThat(response.hairLength()).isEqualTo(appointmentDetail.getHairLength());
+		assertThat(response.hairTreatmentType()).isEqualTo(appointmentDetail.getHairTreatmentType());
+		assertThat(response.requirements()).isEqualTo(appointmentDetail.getRequirements());
+		assertThat(response.requirementsImage()).isEqualTo(appointmentDetail.getRequirementsImage());
+	}
+
+	@DisplayName("예약 최신 상세 조회에 실패하면 IllegalArgumentException이 발생한다.")
+	@Test
+	void givenInvalidAppointmentId_whenGetLatestAppointment_thenThrowException() {
+		// given
+		ClientEntity client = new ClientEntity("nouser@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+			SnsType.NORMAL, null, null);
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		// when & then
+		assertThatThrownBy(() -> appointmentService.getAppointmentByLatest())
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("Appointment not found.");
+	}
 }

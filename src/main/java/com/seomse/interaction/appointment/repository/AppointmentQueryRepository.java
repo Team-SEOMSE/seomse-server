@@ -92,4 +92,24 @@ public class AppointmentQueryRepository {
 				.fetchOne()
 		);
 	}
+
+	public Optional<AppointmentDetailResponse> findAppointmentDetailByLatest(UUID clientId) {
+		return Optional.ofNullable(
+			jpaQueryFactory
+				.select(Projections.constructor(AppointmentDetailResponse.class,
+					appointmentDetailEntity.scaleType,
+					appointmentDetailEntity.hairType,
+					appointmentDetailEntity.hairLength,
+					appointmentDetailEntity.hairTreatmentType,
+					appointmentDetailEntity.requirements,
+					appointmentDetailEntity.requirementsImage
+				))
+				.from(appointmentDetailEntity)
+				.join(appointmentDetailEntity.appointment, appointmentEntity)
+				.where(appointmentEntity.client.id.eq(clientId))
+				.orderBy(appointmentEntity.createdDate.desc())
+				.limit(1)
+				.fetchOne()
+		);
+	}
 }

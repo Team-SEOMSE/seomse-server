@@ -25,6 +25,6 @@ public abstract class IntegrationTestSupport {
 
 	@MockitoBean
 	protected S3Client s3Client;
-	
+
 }
 
