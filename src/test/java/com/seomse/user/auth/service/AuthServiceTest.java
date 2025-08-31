@@ -51,9 +51,11 @@ class AuthServiceTest extends IntegrationTestSupport {
 		// given
 		String email = "user@email.com";
 		String password = "abc1234!";
+		String name = "김섬세";
 		SnsType snsType = SnsType.NORMAL;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, null, null);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
 
 		clientRepository.save(client);
 
@@ -72,10 +74,11 @@ class AuthServiceTest extends IntegrationTestSupport {
 		// given
 		String email = "user@email.com";
 		String password = "abc1234!";
+		String name = "김섬세";
 		SnsType snsType = SnsType.NORMAL;
 		Role role = Role.CLIENT;
 
-		SignupServiceRequest request = new SignupServiceRequest(email, password, snsType, role);
+		SignupServiceRequest request = new SignupServiceRequest(email, password, name, snsType, role);
 
 		// when
 		UUID result = authService.signup(request);
@@ -90,14 +93,16 @@ class AuthServiceTest extends IntegrationTestSupport {
 		// given
 		String email = "user@email.com";
 		String password = "abc1234!";
+		String name = "김섬세";
 		SnsType snsType = SnsType.NORMAL;
 		Role role = Role.CLIENT;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, null, null);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
 
 		clientRepository.save(client);
 
-		SignupServiceRequest request = new SignupServiceRequest(email, password, snsType, role);
+		SignupServiceRequest request = new SignupServiceRequest(email, password, name, snsType, role);
 
 		// when // then
 		Assertions.assertThatThrownBy(() -> authService.signup(request))
@@ -111,10 +116,12 @@ class AuthServiceTest extends IntegrationTestSupport {
 		// given
 		String email = "user@email.com";
 		String password = "abc1234!";
+		String name = "김섬세";
 		SnsType snsType = SnsType.NORMAL;
 		Role role = Role.CLIENT;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, null, null);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
 
 		clientRepository.save(client);
 
@@ -131,8 +138,13 @@ class AuthServiceTest extends IntegrationTestSupport {
 	@Test
 	void oauthKakaoLoginTest() throws JsonProcessingException {
 		// given
+		KakaoUserInfoResponse.KakaoAccount kakaoAccount = new KakaoUserInfoResponse.KakaoAccount(
+			true, false, true, true, "test@email.com"
+		);
+		KakaoUserInfoResponse.Properties properties = new KakaoUserInfoResponse.Properties("김섬세");
+
 		BDDMockito.given(kakaoApiFeignCall.getUserInfo(anyString()))
-			.willReturn(new KakaoUserInfoResponse());
+			.willReturn(new KakaoUserInfoResponse(1L, "2025-09-01T12:58:00Z", kakaoAccount, properties));
 
 		BDDMockito.given(kakaoAuthFeignCall.getToken(anyString(), anyString(), anyString(), anyString(), anyString()))
 			.willReturn(new KakaoTokenResponse("token", "bearer", null, null, null));

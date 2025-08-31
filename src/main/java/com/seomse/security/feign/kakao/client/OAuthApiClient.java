@@ -7,5 +7,7 @@ public interface OAuthApiClient {
 
 	String getEmail(String token);
 
+	String getNickname(String token);
+
 	String getToken(String kakaoClientId, String kakaoRedirectUri, String authorizationCode, String kakaoClientSecret);
 }

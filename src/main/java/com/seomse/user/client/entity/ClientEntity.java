@@ -39,6 +39,9 @@ public class ClientEntity extends BaseTimeEntity {
 	@Column(nullable = true, length = 60)
 	private String password;
 
+	@Column(nullable = false, length = 60)
+	private String name;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private SnsType snsType;
@@ -51,9 +54,10 @@ public class ClientEntity extends BaseTimeEntity {
 	@Column(nullable = true, length = 20)
 	private Age age;
 
-	public ClientEntity(String email, String encodedPassword, SnsType snsType, Gender gender, Age age) {
+	public ClientEntity(String email, String encodedPassword, String name, SnsType snsType, Gender gender, Age age) {
 		this.email = email;
 		this.password = encodedPassword;
+		this.name = name;
 		this.snsType = snsType;
 		this.gender = gender;
 		this.age = age;

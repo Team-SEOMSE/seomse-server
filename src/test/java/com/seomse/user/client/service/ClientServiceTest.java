@@ -44,11 +44,13 @@ class ClientServiceTest extends IntegrationTestSupport {
 		// given
 		String email = "user@email.com";
 		String password = "abc1234!";
+		String name = "김섬세";
 		SnsType snsType = SnsType.NORMAL;
 		Gender gender = Gender.MALE;
 		Age age = Age.TWENTIES;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, gender, age);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, gender,
+			age);
 
 		clientRepository.save(client);
 
@@ -71,9 +73,11 @@ class ClientServiceTest extends IntegrationTestSupport {
 		// given
 		String email = "user@email.com";
 		String password = "abc1234!";
+		String name = "김섬세";
 		SnsType snsType = SnsType.NORMAL;
 
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), snsType, null, null);
+		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
+			null);
 
 		clientRepository.save(client);
 

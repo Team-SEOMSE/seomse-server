@@ -16,6 +16,9 @@ public record SignupRequest(
 	@NotBlank(message = "password is required.")
 	String password,
 
+	@NotBlank(message = "name is required.")
+	String name,
+
 	@NotNull(message = "snsType is required.")
 	SnsType snsType,
 
@@ -24,6 +27,6 @@ public record SignupRequest(
 ) {
 
 	public SignupServiceRequest toServiceRequest() {
-		return new SignupServiceRequest(email, password, snsType, role);
+		return new SignupServiceRequest(email, password, name, snsType, role);
 	}
 }

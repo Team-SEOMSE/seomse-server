@@ -110,7 +110,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -172,7 +172,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -295,7 +295,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerRepository.save(designer);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -342,7 +342,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -387,7 +387,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -433,7 +433,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -479,7 +479,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -548,7 +548,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
@@ -589,7 +589,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenInvalidAppointmentId_whenGetLatestAppointment_thenThrowException() {
 		// given
-		ClientEntity client = new ClientEntity("nouser@email.com", bCryptPasswordEncoder.encode("abc1234!"),
+		ClientEntity client = new ClientEntity("nouser@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
 			SnsType.NORMAL, null, null);
 		clientRepository.save(client);
 
