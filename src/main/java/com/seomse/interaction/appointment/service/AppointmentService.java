@@ -14,6 +14,7 @@ import com.seomse.interaction.appointment.entity.AppointmentEntity;
 import com.seomse.interaction.appointment.repository.AppointmentDetailRepository;
 import com.seomse.interaction.appointment.repository.AppointmentQueryRepository;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
+import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
 import com.seomse.s3.service.S3Service;
 import com.seomse.security.jwt.dto.LoginUserInfo;
@@ -93,5 +94,10 @@ public class AppointmentService {
 			}
 			default -> throw new IllegalStateException("Unsupported role.");
 		}
+	}
+
+	public AppointmentDetailResponse getAppointment(UUID appointmentId) {
+		return appointmentQueryRepository.findAppointmentDetail(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
 	}
 }

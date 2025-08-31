@@ -1,17 +1,20 @@
 package com.seomse.interaction.appointment.repository;
 
+import static com.seomse.interaction.appointment.entity.QAppointmentDetailEntity.*;
 import static com.seomse.interaction.appointment.entity.QAppointmentEntity.*;
 import static com.seomse.shop.entity.QDesignerShopEntity.*;
 import static com.seomse.shop.entity.QShopEntity.*;
 import static com.seomse.user.designer.entity.QDesignerEntity.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -70,5 +73,23 @@ public class AppointmentQueryRepository {
 			.join(designerShopEntity.designer, designerEntity)
 			.where(designerShopEntity.designer.id.eq(designerId))
 			.fetch();
+	}
+
+	public Optional<AppointmentDetailResponse> findAppointmentDetail(UUID appointmentId) {
+		return Optional.ofNullable(
+			jpaQueryFactory
+				.select(Projections.constructor(AppointmentDetailResponse.class,
+					appointmentDetailEntity.scaleType,
+					appointmentDetailEntity.hairType,
+					appointmentDetailEntity.hairLength,
+					appointmentDetailEntity.hairTreatmentType,
+					appointmentDetailEntity.requirements,
+					appointmentDetailEntity.requirementsImage
+				))
+				.from(appointmentDetailEntity)
+				.join(appointmentDetailEntity.appointment, appointmentEntity)
+				.where(appointmentDetailEntity.appointment.id.eq(appointmentId))
+				.fetchOne()
+		);
 	}
 }

@@ -40,19 +40,19 @@ public class AppointmentDetailEntity extends BaseTimeEntity {
 
 	@Column(nullable = false, length = 20)
 	@Enumerated(EnumType.STRING)
-	private ScaleType scaleType;  // 두피 타입 ENUM
+	private ScaleType scaleType;
 
 	@Column(nullable = false, length = 20)
 	@Enumerated(EnumType.STRING)
-	private HairType hairType;  // 모발 유형 ENUM
+	private HairType hairType;
 
 	@Column(nullable = false, length = 20)
 	@Enumerated(EnumType.STRING)
-	private HairLength hairLength;  // 모발 길이 ENUM
+	private HairLength hairLength;
 
 	@Column(nullable = false, length = 50)
 	@Enumerated(EnumType.STRING)
-	private HairTreatmentType hairTreatmentType;  // 시술 여부 ENUM
+	private HairTreatmentType hairTreatmentType;
 
 	@Column(length = 5000)
 	private String requirements;
