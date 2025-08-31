@@ -47,7 +47,7 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 
 		// when // then
 		mockMvc.perform(
-				get("/user/client/me")
+				get("/user/clients/me")
 					.accept(MediaType.APPLICATION_JSON)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
@@ -85,7 +85,7 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 
 		// when // then
 		mockMvc.perform(
-				patch("/user/client/me")
+				patch("/user/clients/me")
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
