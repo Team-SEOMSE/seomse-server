@@ -1,0 +1,67 @@
+package com.seomse.interaction.appointment.service;
+
+import java.io.IOException;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
+import com.seomse.interaction.appointment.entity.AppointmentDetailEntity;
+import com.seomse.interaction.appointment.entity.AppointmentEntity;
+import com.seomse.interaction.appointment.repository.AppointmentDetailRepository;
+import com.seomse.interaction.appointment.repository.AppointmentRepository;
+import com.seomse.s3.service.S3Service;
+import com.seomse.security.jwt.dto.LoginUserInfo;
+import com.seomse.security.service.SecurityService;
+import com.seomse.shop.entity.DesignerShopEntity;
+import com.seomse.shop.repository.DesignerShopRepository;
+import com.seomse.user.client.entity.ClientEntity;
+import com.seomse.user.client.repository.ClientRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Transactional
+@Service
+public class AppointmentService {
+
+	private final SecurityService securityService;
+	private final S3Service s3Service;
+	private final ClientRepository clientRepository;
+	private final DesignerShopRepository designerShopRepository;
+	private final AppointmentRepository appointmentRepository;
+	private final AppointmentDetailRepository appointmentDetailRepository;
+
+	public UUID createAppointment(AppointmentCreateRequest request,
+		MultipartFile requirementsImage) {
+		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
+
+		ClientEntity client = clientRepository.findById(loginUser.userId())
+			.orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+		DesignerShopEntity designerShop = designerShopRepository.findByDesignerId(request.designerId())
+			.orElseThrow(() -> new IllegalArgumentException("DesignerShop not found."));
+
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, request.serviceName());
+
+		appointmentRepository.save(appointment);
+
+		String s3Key = null;
+		if (requirementsImage != null && !requirementsImage.isEmpty()) {
+			try {
+				s3Key = s3Service.upload(requirementsImage);  // ✅ upload 메소드 호출
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to upload requirements image", e);
+			}
+		}
+
+		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, request.scaleType(),
+			request.hairType(), request.hairLength(), request.hairTreatmentType(), request.requirements(), s3Key);
+
+		appointmentDetailRepository.save(appointmentDetail);
+
+		return appointment.getId();
+	}
+}
