@@ -104,13 +104,14 @@ public class AuthService {
 		OAuthApiClient client = clients.get(request.snsType());
 		String accessToken = client.getToken(kakaoClientId, kakaoRedirectUri, request.code(), kakaoClientSecret);
 		String email = client.getEmail(accessToken);
+		String nickname = client.getNickname(accessToken);
 
 		ClientEntity clientEntity = clientRepository.findByEmail(email)
 			.orElseGet(() -> {
-				ClientEntity newClient = new ClientEntity(email, null, request.snsType(), null, null);
+				ClientEntity newClient = new ClientEntity(email, null, nickname, request.snsType(), null, null);
 				return clientRepository.save(newClient);
 			});
-		
+
 		LoginUserInfo userInfo = new LoginUserInfo(clientEntity.getId(), Role.CLIENT);
 		JwtToken jwtToken = jwtTokenGenerator.generate(userInfo);
 

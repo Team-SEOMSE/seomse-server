@@ -17,6 +17,21 @@ public class KakaoUserInfoResponse {
 	@JsonProperty("kakao_account")
 	private KakaoAccount kakaoAccount;
 
+	@JsonProperty("properties")
+	private Properties properties;
+
+	@Getter
+	@NoArgsConstructor
+	public static class Properties {
+
+		@JsonProperty("nickname")
+		private String nickname;
+
+		public Properties(String nickname) {
+			this.nickname = nickname;
+		}
+	}
+
 	public static class KakaoAccount {
 
 		@JsonProperty("has_email")
@@ -45,9 +60,14 @@ public class KakaoUserInfoResponse {
 
 	}
 
-	public KakaoUserInfoResponse(long id, String connectedAt, KakaoAccount kakaoAccount) {
+	public String getNickname() {
+		return properties.nickname;
+	}
+
+	public KakaoUserInfoResponse(long id, String connectedAt, KakaoAccount kakaoAccount, Properties properties) {
 		this.id = id;
 		this.connectedAt = connectedAt;
 		this.kakaoAccount = kakaoAccount;
+		this.properties = properties;
 	}
 }

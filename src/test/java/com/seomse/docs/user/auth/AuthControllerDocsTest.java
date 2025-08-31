@@ -134,7 +134,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 	@Test
 	void signup() throws Exception {
 		// given
-		SignupRequest request = new SignupRequest("user@email.com", "abc1234!", SnsType.NORMAL, Role.CLIENT);
+		SignupRequest request = new SignupRequest("user@email.com", "abc1234!", "김섬세", SnsType.NORMAL, Role.CLIENT);
 
 		given(authService.signup(any(SignupServiceRequest.class)))
 			.willReturn(UUID.randomUUID());
@@ -155,6 +155,8 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 						.description("이메일"),
 					fieldWithPath("password").type(JsonFieldType.STRING)
 						.description("비밀번호"),
+					fieldWithPath("name").type(JsonFieldType.STRING)
+						.description("이름"),
 					fieldWithPath("snsType").type(JsonFieldType.STRING)
 						.description("가입하는 sns 유형. 가능한 값: " + Arrays.toString(SnsType.values())),
 					fieldWithPath("role").type(JsonFieldType.STRING)

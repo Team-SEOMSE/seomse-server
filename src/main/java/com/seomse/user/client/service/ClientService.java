@@ -28,7 +28,8 @@ public class ClientService {
 		ClientEntity client = clientRepository.findById(userInfo.userId())
 			.orElseThrow(() -> new IllegalArgumentException("User not found."));
 
-		return new UserProfileResponse(client.getEmail(), client.getSnsType(), client.getGender(), client.getAge());
+		return new UserProfileResponse(client.getEmail(), client.getName(), client.getSnsType(), client.getGender(),
+			client.getAge());
 	}
 
 	public UUID updateUserProfile(UserProfileUpdateServiceRequest request) {

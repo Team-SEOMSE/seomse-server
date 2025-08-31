@@ -28,6 +28,11 @@ public class KakaoApiClient implements OAuthApiClient {
 	}
 
 	@Override
+	public String getNickname(String accessToken) {
+		return kakaoApiFeignCall.getUserInfo("Bearer " + accessToken).getNickname();
+	}
+
+	@Override
 	public String getToken(String kakaoClientId, String kakaoRedirectUri, String authorizationCode,
 		String kakaoClientSecret) {
 		return kakaoAuthFeignCall.getToken("authorization_code", kakaoClientId, kakaoRedirectUri, authorizationCode,

@@ -43,7 +43,7 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 	void checkEmail() throws Exception {
 		// given
 		given(clientService.getUserProfile())
-			.willReturn(new UserProfileResponse("user@email.com", SnsType.NORMAL, Gender.FEMALE, Age.TWENTIES));
+			.willReturn(new UserProfileResponse("user@email.com", "김섬세", SnsType.NORMAL, Gender.FEMALE, Age.TWENTIES));
 
 		// when // then
 		mockMvc.perform(
@@ -64,6 +64,8 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 						.description("응답 코드"),
 					fieldWithPath("data.email").type(JsonFieldType.STRING)
 						.description("사용자 이메일"),
+					fieldWithPath("data.name").type(JsonFieldType.STRING)
+						.description("사용자 이름(또는 닉네임)"),
 					fieldWithPath("data.snsType").type(JsonFieldType.STRING)
 						.description("SNS 타입. 가능한 값: " + Arrays.toString(SnsType.values())),
 					fieldWithPath("data.gender").type(JsonFieldType.STRING)
