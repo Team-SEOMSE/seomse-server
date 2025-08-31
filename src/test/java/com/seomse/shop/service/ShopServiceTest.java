@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.seomse.IntegrationTestSupport;
+import com.seomse.interaction.appointment.repository.AppointmentRepository;
+import com.seomse.interaction.review.repository.ReviewRepository;
 import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.enums.Type;
@@ -43,8 +45,16 @@ class ShopServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private DesignerShopRepository designerShopRepository;
 
+	@Autowired
+	private ReviewRepository reviewRepository;
+
+	@Autowired
+	private AppointmentRepository appointmentRepository;
+
 	@AfterEach
 	void tearDown() {
+		reviewRepository.deleteAll();
+		appointmentRepository.deleteAll();
 		designerShopRepository.deleteAll();
 		shopRepository.deleteAll();
 		designerRepository.deleteAll();

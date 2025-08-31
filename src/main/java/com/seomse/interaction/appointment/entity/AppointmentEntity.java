@@ -2,7 +2,9 @@ package com.seomse.interaction.appointment.entity;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import com.seomse.common.entity.BaseTimeEntity;
 import com.seomse.shop.entity.DesignerShopEntity;
@@ -27,6 +29,7 @@ public class AppointmentEntity extends BaseTimeEntity {
 
 	@Id
 	@UuidGenerator
+	@JdbcTypeCode(SqlTypes.BINARY)
 	@Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
 	private UUID id;
 

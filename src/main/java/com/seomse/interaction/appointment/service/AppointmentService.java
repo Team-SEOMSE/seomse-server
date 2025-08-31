@@ -57,7 +57,7 @@ public class AppointmentService {
 		String s3Key = null;
 		if (requirementsImage != null && !requirementsImage.isEmpty()) {
 			try {
-				s3Key = s3Service.upload(requirementsImage);  // ✅ upload 메소드 호출
+				s3Key = s3Service.upload(requirementsImage);
 			} catch (IOException e) {
 				throw new RuntimeException("Failed to upload requirements image.", e);
 			}
