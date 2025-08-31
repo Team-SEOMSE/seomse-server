@@ -274,7 +274,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		//when
 		//then
 		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
-			.isInstanceOf(RuntimeException.class)
+			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("User not found.");
 	}
 
@@ -317,7 +317,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		//when
 		//then
 		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
-			.isInstanceOf(RuntimeException.class)
+			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("DesignerShop not found.");
 	}
 

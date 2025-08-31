@@ -1,20 +1,27 @@
 package com.seomse.user.auth.service;
 
+import static org.mockito.ArgumentMatchers.*;
+
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.seomse.IntegrationTestSupport;
 import com.seomse.common.exception.DuplicateEmailException;
+import com.seomse.security.feign.kakao.response.KakaoTokenResponse;
+import com.seomse.security.feign.kakao.response.KakaoUserInfoResponse;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.auth.service.request.EmailCheckServiceRequest;
 import com.seomse.user.auth.service.request.LoginServiceRequest;
+import com.seomse.user.auth.service.request.OauthLoginServiceRequest;
 import com.seomse.user.auth.service.request.SignupServiceRequest;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
 import com.seomse.user.auth.service.response.LoginResponse;
@@ -117,5 +124,24 @@ class AuthServiceTest extends IntegrationTestSupport {
 		EmailCheckResponse result = authService.emailExists(request);
 
 		Assertions.assertThat(result.duplicate()).isTrue();
+	}
+
+	@Transactional
+	@DisplayName("카카오 로그인을 한다.")
+	@Test
+	void oauthKakaoLoginTest() throws JsonProcessingException {
+		// given
+		BDDMockito.given(kakaoApiFeignCall.getUserInfo(anyString()))
+			.willReturn(new KakaoUserInfoResponse());
+
+		BDDMockito.given(kakaoAuthFeignCall.getToken(anyString(), anyString(), anyString(), anyString(), anyString()))
+			.willReturn(new KakaoTokenResponse("token", "bearer", null, null, null));
+
+		OauthLoginServiceRequest request = new OauthLoginServiceRequest("ASDJKSAN", SnsType.KAKAO);
+
+		// when
+		LoginResponse response = authService.oauthLogin(request);
+
+		Assertions.assertThat(response.accessToken()).isNotNull();
 	}
 }
