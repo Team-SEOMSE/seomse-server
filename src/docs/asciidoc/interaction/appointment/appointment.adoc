@@ -1,0 +1,61 @@
+[[appointment-create]]
+=== 예약 생성
+
+==== HTTP Request
+
+include::{snippets}/appointment-create/http-request.adoc[]
+
+==== Request Parts
+
+include::{snippets}/appointment-create/request-parts.adoc[]
+
+==== Request Part Fields (request)
+
+include::{snippets}/appointment-create/request-part-request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/appointment-create/http-response.adoc[]
+include::{snippets}/appointment-create/response-fields.adoc[]
+
+[[appointment-get-list]]
+=== 예약 조회 전체
+
+==== HTTP Request
+
+include::{snippets}/appointment-get-list/http-request.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/appointment-get-list/http-response.adoc[]
+include::{snippets}/appointment-get-list/response-fields.adoc[]
+
+[[appointment-get-detail]]
+=== 예약 상세 조회 단일
+
+==== HTTP Request
+
+include::{snippets}/appointment-get-detail/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/appointment-get-detail/path-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/appointment-get-detail/http-response.adoc[]
+include::{snippets}/appointment-get-detail/response-fields.adoc[]
+
+[[appointment-get-latest-detail]]
+=== 예약 세부사항 조회 (최신)
+
+==== HTTP Request
+
+include::{snippets}/appointment-get-detail-latest/http-request.adoc[]
+include::{snippets}/appointment-get-detail-latest/request-headers.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/appointment-get-detail-latest/http-response.adoc[]
+include::{snippets}/appointment-get-detail-latest/response-fields.adoc[]
+

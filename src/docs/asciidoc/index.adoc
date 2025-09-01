@@ -18,3 +18,8 @@ include::user/auth.adoc[]
 == CLIENT API
 
 include::user/client.adoc[]
+
+[[Appointment-API]]
+== Appointment API
+
+include::interaction/appointment/appointment.adoc[]
