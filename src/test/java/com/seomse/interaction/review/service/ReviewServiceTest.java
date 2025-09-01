@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import com.seomse.interaction.appointment.entity.AppointmentEntity;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.review.controller.request.ReviewCreateRequest;
 import com.seomse.interaction.review.entity.ReviewEntity;
-import com.seomse.interaction.review.repository.ReviewQueryRepository;
 import com.seomse.interaction.review.repository.ReviewRepository;
 import com.seomse.interaction.review.service.response.ReviewListResponse;
 import com.seomse.security.jwt.dto.LoginUserInfo;
@@ -68,10 +68,8 @@ class ReviewServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private ReviewRepository reviewRepository;
 
-	@Autowired
-	private ReviewQueryRepository reviewQueryRepository;
-
-	void createReview() {
+	@AfterEach
+	void tearDown() {
 		reviewRepository.deleteAll();
 		appointmentRepository.deleteAll();
 		designerShopRepository.deleteAll();
