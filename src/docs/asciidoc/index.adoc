@@ -18,3 +18,8 @@ include::user/auth.adoc[]
 == CLIENT API
 
 include::user/client.adoc[]
+
+[[Review-API]]
+== Review API
+
+include::interaction/review/review.adoc[]
