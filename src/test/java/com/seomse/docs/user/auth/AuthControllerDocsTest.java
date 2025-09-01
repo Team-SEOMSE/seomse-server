@@ -70,20 +70,15 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(
-					fieldWithPath("email").type(JsonFieldType.STRING)
-						.description("이메일"),
-					fieldWithPath("password").type(JsonFieldType.STRING)
-						.description("비밀번호"),
+					fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+					fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호"),
 					fieldWithPath("role").type(JsonFieldType.STRING)
 						.description("로그인한 유저의 역할. 가능한 값: " + Arrays.toString(Role.values()))
 				),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("코드"),
-					fieldWithPath("data").type(JsonFieldType.OBJECT)
-						.description("응답 데이터"),
-					fieldWithPath("data.accessToken").type(JsonFieldType.STRING)
-						.description("인증 토큰")
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("코드"),
+					fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+					fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("인증 토큰")
 				)
 			));
 	}
@@ -114,18 +109,14 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(
-					fieldWithPath("code").type(JsonFieldType.STRING)
-						.description("카카오 API에서 반환된 Code"),
+					fieldWithPath("code").type(JsonFieldType.STRING).description("카카오 API에서 반환된 Code"),
 					fieldWithPath("snsType").type(JsonFieldType.STRING)
 						.description("가입하는 sns 유형. 가능한 값: " + Arrays.toString(SnsType.values()))
 				),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("코드"),
-					fieldWithPath("data").type(JsonFieldType.OBJECT)
-						.description("응답 데이터"),
-					fieldWithPath("data.accessToken").type(JsonFieldType.STRING)
-						.description("인증 토큰")
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("코드"),
+					fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+					fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("인증 토큰")
 				)
 			));
 	}
@@ -151,22 +142,17 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(
-					fieldWithPath("email").type(JsonFieldType.STRING)
-						.description("이메일"),
-					fieldWithPath("password").type(JsonFieldType.STRING)
-						.description("비밀번호"),
-					fieldWithPath("name").type(JsonFieldType.STRING)
-						.description("이름"),
+					fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+					fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호"),
+					fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
 					fieldWithPath("snsType").type(JsonFieldType.STRING)
 						.description("가입하는 sns 유형. 가능한 값: " + Arrays.toString(SnsType.values())),
 					fieldWithPath("role").type(JsonFieldType.STRING)
 						.description("가입하는 유저의 역할. 가능한 값: " + Arrays.toString(Role.values()))
 				),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("코드"),
-					fieldWithPath("data").type(JsonFieldType.STRING)
-						.description("응답 데이터, 저장된 사용자 ID")
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("코드"),
+					fieldWithPath("data").type(JsonFieldType.STRING).description("응답 데이터, 저장된 사용자 ID")
 				)
 			));
 	}
@@ -185,7 +171,6 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 				get("/user/auth/check")
 					.param("email", request.email())
 					.param("role", request.role().name())
-					.accept(MediaType.APPLICATION_JSON)
 			)
 			.andDo(print())
 			.andExpect(status().isOk())
@@ -198,8 +183,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 					parameterWithName("role").description("유저 역할. 가능한 값: " + Arrays.toString(Role.values()))
 				),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("코드"),
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("코드"),
 					fieldWithPath("data.duplicate").type(JsonFieldType.BOOLEAN)
 						.description("중복 여부. true=이미 사용 중, false=사용 가능")
 				)

@@ -3,8 +3,8 @@
 
 ==== HTTP Request
 
-include::{snippets}/shop-get-list/query-parameters.adoc[]
 include::{snippets}/shop-get-list/http-request.adoc[]
+include::{snippets}/shop-get-list/query-parameters.adoc[]
 
 ==== HTTP Response
 
@@ -17,6 +17,7 @@ include::{snippets}/shop-get-list/response-fields.adoc[]
 ==== HTTP Request
 
 include::{snippets}/shop-get-detail/http-request.adoc[]
+include::{snippets}/shop-get-detail/path-parameters.adoc[]
 
 ==== HTTP Response
 

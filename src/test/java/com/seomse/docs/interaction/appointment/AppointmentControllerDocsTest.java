@@ -81,9 +81,9 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 				multipart("/interaction/appointments")
 					.file(requestPart)
 					.file(imagePart)
-					.header(HttpHeaders.AUTHORIZATION, "Bearer JWT_ACCESS TOKEN")
-					.accept(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request))
 					.contentType(MediaType.APPLICATION_JSON)
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isCreated())
 			.andDo(print())
@@ -128,9 +128,7 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		// when // then
 		mockMvc.perform(
 				get("/interaction/appointments")
-					.header(HttpHeaders.AUTHORIZATION, "Bearer JWT_ACCESS TOKEN")
-					.accept(MediaType.APPLICATION_JSON)
-					.contentType(MediaType.APPLICATION_JSON)
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -138,16 +136,11 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("응답 코드"),
-					fieldWithPath("data[].appointmentId").type(JsonFieldType.STRING)
-						.description("예약 UUID"),
-					fieldWithPath("data[].shopName").type(JsonFieldType.STRING)
-						.description("샵 이름"),
-					fieldWithPath("data[].designerNickname").type(JsonFieldType.STRING)
-						.description("디자이너 닉네임"),
-					fieldWithPath("data[].serviceName").type(JsonFieldType.STRING)
-						.description("시술명"),
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data[].appointmentId").type(JsonFieldType.STRING).description("예약 UUID"),
+					fieldWithPath("data[].shopName").type(JsonFieldType.STRING).description("샵 이름"),
+					fieldWithPath("data[].designerNickname").type(JsonFieldType.STRING).description("디자이너 닉네임"),
+					fieldWithPath("data[].serviceName").type(JsonFieldType.STRING).description("시술명"),
 					fieldWithPath("data[].appointmentDate").type(JsonFieldType.STRING)
 						.description("예약 일시 (yyyy-MM-dd HH:mm:ss)")
 				)
@@ -172,9 +165,7 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		// when // then
 		mockMvc.perform(
 				get("/interaction/appointments/{appointmentId}/details", appointmentId)
-					.header(HttpHeaders.AUTHORIZATION, "Bearer JWT_ACCESS TOKEN")
-					.accept(MediaType.APPLICATION_JSON)
-					.contentType(MediaType.APPLICATION_JSON)
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -185,17 +176,13 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 					parameterWithName("appointmentId").description("조회할 예약의 UUID")
 				),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("응답 코드"),
-					fieldWithPath("data.scaleType").description("두피 타입. 가능한 값: " + Arrays.toString(ScaleType.values())),
-					fieldWithPath("data.hairType").description("모발 타입. 가능한 값: " + Arrays.toString(HairType.values())),
-					fieldWithPath("data.hairLength").description(
-						"머리 길이. 가능한 값: " + Arrays.toString(HairLength.values())),
-					fieldWithPath("data.hairTreatmentType").description(
-						"모발 시술 이력. 가능한 값: " + Arrays.toString(HairTreatmentType.values())),
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data.scaleType").description("두피 타입"),
+					fieldWithPath("data.hairType").description("모발 타입"),
+					fieldWithPath("data.hairLength").description("머리 길이"),
+					fieldWithPath("data.hairTreatmentType").description("모발 시술 이력"),
 					fieldWithPath("data.requirements").type(JsonFieldType.STRING).description("고객 요청사항"),
-					fieldWithPath("data.requirementsImage").type(JsonFieldType.STRING)
-						.description("요청사항 이미지")
+					fieldWithPath("data.requirementsImage").type(JsonFieldType.STRING).description("요청사항 이미지")
 				)
 			));
 	}
@@ -218,9 +205,7 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		// when // then
 		mockMvc.perform(
 				get("/interaction/appointments/details")
-					.header(HttpHeaders.AUTHORIZATION, "Bearer JWT ACCESS TOKEN")
-					.accept(MediaType.APPLICATION_JSON)
-					.contentType(MediaType.APPLICATION_JSON)
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -228,19 +213,16 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
-					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer JWT Access Token")
+					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer <JWT ACCESS TOKEN>")
 				),
 				responseFields(
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
-					fieldWithPath("data.scaleType").description("두피 타입. 가능한 값: " + Arrays.toString(ScaleType.values())),
-					fieldWithPath("data.hairType").description("모발 타입. 가능한 값: " + Arrays.toString(HairType.values())),
-					fieldWithPath("data.hairLength").description(
-						"머리 길이. 가능한 값: " + Arrays.toString(HairLength.values())),
-					fieldWithPath("data.hairTreatmentType").description(
-						"모발 시술 이력. 가능한 값: " + Arrays.toString(HairTreatmentType.values())),
+					fieldWithPath("data.scaleType").description("두피 타입"),
+					fieldWithPath("data.hairType").description("모발 타입"),
+					fieldWithPath("data.hairLength").description("머리 길이"),
+					fieldWithPath("data.hairTreatmentType").description("모발 시술 이력"),
 					fieldWithPath("data.requirements").type(JsonFieldType.STRING).description("고객 요청사항"),
-					fieldWithPath("data.requirementsImage").type(JsonFieldType.STRING)
-						.description("요청사항 이미지")
+					fieldWithPath("data.requirementsImage").type(JsonFieldType.STRING).description("요청사항 이미지")
 				)
 			));
 	}
