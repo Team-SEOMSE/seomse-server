@@ -1,0 +1,24 @@
+[[shop-get-list]]
+=== 뷰티샵 조회(전체)
+
+==== HTTP Request
+
+include::{snippets}/shop-get-list/query-parameters.adoc[]
+include::{snippets}/shop-get-list/http-request.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/shop-get-list/http-response.adoc[]
+include::{snippets}/shop-get-list/response-fields.adoc[]
+
+[[shop-get-detail]]
+=== 뷰티샵 조회(Id 단일 조회)
+
+==== HTTP Request
+
+include::{snippets}/shop-get-detail/http-request.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/shop-get-detail/http-response.adoc[]
+include::{snippets}/shop-get-detail/response-fields.adoc[]

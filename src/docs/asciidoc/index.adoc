@@ -18,3 +18,8 @@ include::user/auth.adoc[]
 == CLIENT API
 
 include::user/client.adoc[]
+
+[[Shop-API]]
+== SHOP API
+
+include::shop/shop.adoc[]
