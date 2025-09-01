@@ -1,5 +1,7 @@
 package com.seomse.docs;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -29,7 +31,15 @@ public abstract class RestDocsSupport {
 	void setup(RestDocumentationContextProvider provider) {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
 			.setMessageConverters(new MappingJackson2HttpMessageConverter(this.objectMapper))
-			.apply(MockMvcRestDocumentation.documentationConfiguration(provider))
+			.apply(MockMvcRestDocumentation.documentationConfiguration(provider)
+				.operationPreprocessors()
+				.withRequestDefaults(modifyUris()
+						.scheme("https")
+						.host("api.seomse.kro.kr")
+						.removePort(),
+					prettyPrint())
+				.withResponseDefaults(prettyPrint())
+			)
 			.build();
 	}
 

@@ -48,7 +48,6 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 		// when // then
 		mockMvc.perform(
 				get("/user/clients/me")
-					.accept(MediaType.APPLICATION_JSON)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andDo(print())
@@ -57,21 +56,15 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
-					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer JWT Access Token")
+					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer <JWT ACCESS TOKEN>")
 				),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("응답 코드"),
-					fieldWithPath("data.email").type(JsonFieldType.STRING)
-						.description("사용자 이메일"),
-					fieldWithPath("data.name").type(JsonFieldType.STRING)
-						.description("사용자 이름(또는 닉네임)"),
-					fieldWithPath("data.snsType").type(JsonFieldType.STRING)
-						.description("SNS 타입. 가능한 값: " + Arrays.toString(SnsType.values())),
-					fieldWithPath("data.gender").type(JsonFieldType.STRING)
-						.description("성별. 가능한 값: " + Arrays.toString(Gender.values())),
-					fieldWithPath("data.age").type(JsonFieldType.STRING)
-						.description("연령대. 가능한 값: " + Arrays.toString(Age.values()))
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data.email").type(JsonFieldType.STRING).description("사용자 이메일"),
+					fieldWithPath("data.name").type(JsonFieldType.STRING).description("사용자 이름(또는 닉네임)"),
+					fieldWithPath("data.snsType").type(JsonFieldType.STRING).description("SNS 타입"),
+					fieldWithPath("data.gender").type(JsonFieldType.STRING).description("성별"),
+					fieldWithPath("data.age").type(JsonFieldType.STRING).description("연령대")
 				)
 			));
 	}
@@ -98,7 +91,7 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
-					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer JWT Access Token")
+					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer <JWT ACCESS TOKEN>")
 				),
 				requestFields(
 					fieldWithPath("gender").type(JsonFieldType.STRING)
@@ -107,10 +100,8 @@ public class ClientControllerDocsTest extends RestDocsSupport {
 						.description("연령대. 가능한 값: " + Arrays.toString(Age.values()))
 				),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("응답 코드"),
-					fieldWithPath("data").type(JsonFieldType.STRING)
-						.description("응답 데이터, 저장된 사용자 ID")
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data").type(JsonFieldType.STRING).description("응답 데이터, 저장된 사용자 ID")
 				)
 			));
 	}

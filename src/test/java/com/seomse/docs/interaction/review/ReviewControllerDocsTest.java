@@ -66,14 +66,16 @@ public class ReviewControllerDocsTest extends RestDocsSupport {
 				multipart("/interaction/reviews")
 					.file(requestPart)
 					.file(imagePart)
-					.header(HttpHeaders.AUTHORIZATION, "Bearer JWT ACCESS TOKEN")
 					.contentType(MediaType.MULTIPART_FORM_DATA)
-					.accept(MediaType.APPLICATION_JSON)
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isCreated())
 			.andDo(document("review-create",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer <JWT ACCESS TOKEN>")
+				),
 				requestParts(
 					partWithName("request").description("리뷰 작성 요청 JSON"),
 					partWithName("reviewImage").description("리뷰 이미지 (optional)").optional()
@@ -82,9 +84,6 @@ public class ReviewControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("appointmentId").type(JsonFieldType.STRING).description("예약 UUID"),
 					fieldWithPath("reviewRating").type(JsonFieldType.STRING).description("리뷰 평점 (1~5)"),
 					fieldWithPath("reviewContent").type(JsonFieldType.STRING).description("리뷰 내용")
-				),
-				requestHeaders(
-					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer JWT Access Token")
 				),
 				responseFields(
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
@@ -125,8 +124,7 @@ public class ReviewControllerDocsTest extends RestDocsSupport {
 		// when // then
 		mockMvc.perform(
 				get("/interaction/reviews")
-					.accept(MediaType.APPLICATION_JSON)
-					.contentType(MediaType.APPLICATION_JSON)
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -134,23 +132,16 @@ public class ReviewControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				responseFields(
-					fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
-						.description("응답 코드"),
-					fieldWithPath("data[].reviewId").type(JsonFieldType.STRING)
-						.description("리뷰 UUID"),
-					fieldWithPath("data[].reviewRating").type(JsonFieldType.STRING)
-						.description("리뷰 평점 (1~5)"),
-					fieldWithPath("data[].reviewContent").type(JsonFieldType.STRING)
-						.description("리뷰 내용"),
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data[].reviewId").type(JsonFieldType.STRING).description("리뷰 UUID"),
+					fieldWithPath("data[].reviewRating").type(JsonFieldType.STRING).description("리뷰 평점 (1~5)"),
+					fieldWithPath("data[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
 					fieldWithPath("data[].reviewImage").type(JsonFieldType.STRING)
 						.optional()
 						.description("리뷰 이미지 (선택)"),
-					fieldWithPath("data[].shopName").type(JsonFieldType.STRING)
-						.description("샵 이름"),
-					fieldWithPath("data[].designerNickName").type(JsonFieldType.STRING)
-						.description("디자이너 닉네임"),
-					fieldWithPath("data[].serviceName").type(JsonFieldType.STRING)
-						.description("시술명"),
+					fieldWithPath("data[].shopName").type(JsonFieldType.STRING).description("샵 이름"),
+					fieldWithPath("data[].designerNickName").type(JsonFieldType.STRING).description("디자이너 닉네임"),
+					fieldWithPath("data[].serviceName").type(JsonFieldType.STRING).description("시술명"),
 					fieldWithPath("data[].appointmentDate").type(JsonFieldType.STRING)
 						.description("예약 일시 (yyyy-MM-dd HH:mm:ss)")
 				)

@@ -8,9 +8,6 @@ include::{snippets}/appointment-create/http-request.adoc[]
 ==== Request Parts
 
 include::{snippets}/appointment-create/request-parts.adoc[]
-
-==== Request Part Fields (request)
-
 include::{snippets}/appointment-create/request-part-request-fields.adoc[]
 
 ==== HTTP Response
@@ -36,9 +33,6 @@ include::{snippets}/appointment-get-list/response-fields.adoc[]
 ==== HTTP Request
 
 include::{snippets}/appointment-get-detail/http-request.adoc[]
-
-==== Path Parameters
-
 include::{snippets}/appointment-get-detail/path-parameters.adoc[]
 
 ==== HTTP Response
@@ -52,7 +46,6 @@ include::{snippets}/appointment-get-detail/response-fields.adoc[]
 ==== HTTP Request
 
 include::{snippets}/appointment-get-detail-latest/http-request.adoc[]
-include::{snippets}/appointment-get-detail-latest/request-headers.adoc[]
 
 ==== HTTP Response
 
