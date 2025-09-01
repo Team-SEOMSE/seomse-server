@@ -1,0 +1,26 @@
+[[review-create]]
+=== 리뷰 작성하기
+
+==== HTTP Request
+
+include::{snippets}/review-create/http-request.adoc[]
+include::{snippets}/review-create/request-headers.adoc[]
+include::{snippets}/review-create/request-parts.adoc[]
+include::{snippets}/review-create/request-part-request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/review-create/http-response.adoc[]
+include::{snippets}/review-create/response-fields.adoc[]
+
+[[review-get-list]]
+=== 디자이너, 점주 리뷰 조회(전체)
+
+==== HTTP Request
+
+include::{snippets}/review-get-list/http-request.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/review-get-list/http-response.adoc[]
+include::{snippets}/review-get-list/response-fields.adoc[]

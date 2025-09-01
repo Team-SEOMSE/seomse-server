@@ -28,3 +28,8 @@ include::shop/shop.adoc[]
 == Appointment API
 
 include::interaction/appointment/appointment.adoc[]
+
+[[Review-API]]
+== Review API
+
+include::interaction/review/review.adoc[]
