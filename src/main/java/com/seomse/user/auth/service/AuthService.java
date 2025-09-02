@@ -2,6 +2,7 @@ package com.seomse.user.auth.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -13,17 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.seomse.common.exception.DuplicateEmailException;
-import com.seomse.security.feign.kakao.client.OAuthApiClient;
+import com.seomse.security.feign.kakao.client.OauthApiClient;
 import com.seomse.security.jwt.JwtTokenGenerator;
 import com.seomse.security.jwt.dto.JwtToken;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.user.auth.enums.Role;
+import com.seomse.user.auth.service.dto.ClientAndStatus;
 import com.seomse.user.auth.service.request.EmailCheckServiceRequest;
 import com.seomse.user.auth.service.request.LoginServiceRequest;
 import com.seomse.user.auth.service.request.OauthLoginServiceRequest;
 import com.seomse.user.auth.service.request.SignupServiceRequest;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
 import com.seomse.user.auth.service.response.LoginResponse;
+import com.seomse.user.auth.service.response.OauthLoginResponse;
 import com.seomse.user.client.entity.ClientEntity;
 import com.seomse.user.client.enums.SnsType;
 import com.seomse.user.client.repository.ClientRepository;
@@ -38,9 +41,9 @@ public class AuthService {
 
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final JwtTokenGenerator jwtTokenGenerator;
-	private final List<OAuthApiClient> clientsList;
+	private final List<OauthApiClient> clientsList;
 
-	private Map<SnsType, OAuthApiClient> clients;
+	private Map<SnsType, OauthApiClient> clients;
 
 	private final ClientRepository clientRepository;
 
@@ -56,7 +59,7 @@ public class AuthService {
 	@PostConstruct
 	private void initializeClients() {
 		this.clients = clientsList.stream().collect(
-			Collectors.toUnmodifiableMap(OAuthApiClient::oauthSnsType, Function.identity())
+			Collectors.toUnmodifiableMap(OauthApiClient::oauthSnsType, Function.identity())
 		);
 	}
 
@@ -100,22 +103,31 @@ public class AuthService {
 		};
 	}
 
-	public LoginResponse oauthLogin(OauthLoginServiceRequest request) throws JsonProcessingException {
-		OAuthApiClient client = clients.get(request.snsType());
+	public OauthLoginResponse oauthLogin(OauthLoginServiceRequest request) throws JsonProcessingException {
+		OauthApiClient client = clients.get(request.snsType());
 		String accessToken = client.getToken(kakaoClientId, kakaoRedirectUri, request.code(), kakaoClientSecret);
 		String email = client.getEmail(accessToken);
 		String nickname = client.getNickname(accessToken);
 
-		ClientEntity clientEntity = clientRepository.findByEmail(email)
-			.orElseGet(() -> {
-				ClientEntity newClient = new ClientEntity(email, null, nickname, request.snsType(), null, null);
-				return clientRepository.save(newClient);
-			});
+		ClientAndStatus result = findOrCreateClient(email, nickname, request.snsType());
 
-		LoginUserInfo userInfo = new LoginUserInfo(clientEntity.getId(), Role.CLIENT);
+		LoginUserInfo userInfo = new LoginUserInfo(result.client().getId(), Role.CLIENT);
 		JwtToken jwtToken = jwtTokenGenerator.generate(userInfo);
 
-		return new LoginResponse(jwtToken.accessToken());
+		return new OauthLoginResponse(jwtToken.accessToken(), result.isNew());
 	}
 
+	private ClientAndStatus findOrCreateClient(String email, String nickname, SnsType snsType) {
+		Optional<ClientEntity> optionalClient = clientRepository.findByEmail(email);
+
+		if (optionalClient.isPresent()) {
+			ClientEntity clientEntity = optionalClient.get();
+			boolean isProfileComplete = clientEntity.getAge() != null && clientEntity.getGender() != null;
+			return new ClientAndStatus(clientEntity, !isProfileComplete);
+		} else {
+			ClientEntity newClient = new ClientEntity(email, null, nickname, snsType, null, null);
+			clientRepository.save(newClient);
+			return new ClientAndStatus(newClient, true);
+		}
+	}
 }

@@ -33,6 +33,7 @@ import com.seomse.user.auth.service.request.OauthLoginServiceRequest;
 import com.seomse.user.auth.service.request.SignupServiceRequest;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
 import com.seomse.user.auth.service.response.LoginResponse;
+import com.seomse.user.auth.service.response.OauthLoginResponse;
 import com.seomse.user.client.enums.SnsType;
 
 public class AuthControllerDocsTest extends RestDocsSupport {
@@ -90,11 +91,11 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 		OauthLoginRequest request = new OauthLoginRequest("ADFDAFS", SnsType.KAKAO);
 
 		given(authService.oauthLogin(any(OauthLoginServiceRequest.class)))
-			.willReturn(new LoginResponse(
+			.willReturn(new OauthLoginResponse(
 				"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VySWRcIjpcImY4MWQ0ZmFlLTdkZWMtMTFkMC1hNzY1LTAwYTBjO"
 					+ "TFlNmJmNlwiLFwicm9sZVwiOlwiQ0xJRU5UXCJ9IiwiZXhwIjoxNzU1OTY3MTA4LCJVVUlEIjoiOTdhOWRlMWItNGFiNS00"
 					+ "N2E1LWJkMDktMTc5MGUxMDc4NWY1In0.Fz9O6EfhonoWspVddRofnw7IoXCmkXrgseSCZajMU1-OqYXxq82I_U1x9Xfgc9z"
-					+ "cYv-pHLKMTJXGqoTegWuN4A")
+					+ "cYv-pHLKMTJXGqoTegWuN4A", true)
 			);
 
 		// when // then
@@ -116,7 +117,9 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 				responseFields(
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("코드"),
 					fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-					fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("인증 토큰")
+					fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("인증 토큰"),
+					fieldWithPath("data.isNew").type(JsonFieldType.BOOLEAN)
+						.description("계정 여부. true=새로운 계정, false=이미 가입된 계정")
 				)
 			));
 	}

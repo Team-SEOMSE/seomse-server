@@ -19,6 +19,7 @@ import com.seomse.user.auth.controller.request.SignupRequest;
 import com.seomse.user.auth.service.AuthService;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
 import com.seomse.user.auth.service.response.LoginResponse;
+import com.seomse.user.auth.service.response.OauthLoginResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/oauth/login")
-	public ApiResponse<LoginResponse> oauthLogin(@Valid @RequestBody OauthLoginRequest request) throws
+	public ApiResponse<OauthLoginResponse> oauthLogin(@Valid @RequestBody OauthLoginRequest request) throws
 		JsonProcessingException {
 		return ApiResponse.ok(authService.oauthLogin(request.toServiceRequest()));
 	}

@@ -25,6 +25,7 @@ import com.seomse.user.auth.service.request.OauthLoginServiceRequest;
 import com.seomse.user.auth.service.request.SignupServiceRequest;
 import com.seomse.user.auth.service.response.EmailCheckResponse;
 import com.seomse.user.auth.service.response.LoginResponse;
+import com.seomse.user.auth.service.response.OauthLoginResponse;
 import com.seomse.user.client.entity.ClientEntity;
 import com.seomse.user.client.enums.SnsType;
 import com.seomse.user.client.repository.ClientRepository;
@@ -152,8 +153,9 @@ class AuthServiceTest extends IntegrationTestSupport {
 		OauthLoginServiceRequest request = new OauthLoginServiceRequest("ASDJKSAN", SnsType.KAKAO);
 
 		// when
-		LoginResponse response = authService.oauthLogin(request);
+		OauthLoginResponse response = authService.oauthLogin(request);
 
 		Assertions.assertThat(response.accessToken()).isNotNull();
+		Assertions.assertThat(response.isNew()).isTrue();
 	}
 }
