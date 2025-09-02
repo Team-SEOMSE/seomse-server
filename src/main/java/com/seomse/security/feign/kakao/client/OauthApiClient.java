@@ -2,7 +2,7 @@ package com.seomse.security.feign.kakao.client;
 
 import com.seomse.user.client.enums.SnsType;
 
-public interface OAuthApiClient {
+public interface OauthApiClient {
 	SnsType oauthSnsType();
 
 	String getEmail(String token);

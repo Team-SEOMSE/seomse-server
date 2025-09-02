@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class KakaoApiClient implements OAuthApiClient {
+public class KakaoApiClient implements OauthApiClient {
 
 	private final KakaoApiFeignCall kakaoApiFeignCall;
 	private final KakaoAuthFeignCall kakaoAuthFeignCall;
