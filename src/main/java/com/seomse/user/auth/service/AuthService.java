@@ -71,24 +71,24 @@ public class AuthService {
 			throw new IllegalArgumentException("Invalid email or password.");
 		}
 
-		LoginUserInfo userInfo = new LoginUserInfo(client.getId(), request.role());
-		JwtToken jwtToken = jwtTokenGenerator.generate(userInfo);
-
-		return new LoginResponse(jwtToken.accessToken());
+		String accessToken = generateAccessToken(client.getId(), Role.CLIENT);
+		return new LoginResponse(accessToken);
 	}
 
-	public UUID signup(SignupServiceRequest request) {
+	public LoginResponse signup(SignupServiceRequest request) throws JsonProcessingException {
 		if (emailExists(request.email(), request.role())) {
-			throw new DuplicateEmailException("이미 사용 중인 이메일입니다: " + request.email());
+			throw new DuplicateEmailException("This email is already in use: " + request.email());
 		}
 
 		return switch (request.role()) {
 			case CLIENT -> {
 				ClientEntity client = request.toClientEntity(bCryptPasswordEncoder);
-				ClientEntity saved = clientRepository.save(client);
-				yield saved.getId();
+				ClientEntity savedClient = clientRepository.save(client);
+				String accessToken = generateAccessToken(savedClient.getId(), request.role());
+				yield new LoginResponse(accessToken);
 			}
-			case DESIGNER, OWNER -> null; // 추후 개발
+			case DESIGNER, OWNER ->
+				throw new UnsupportedOperationException("Designer and Owner roles are not yet implemented.");
 		};
 	}
 
@@ -105,16 +105,20 @@ public class AuthService {
 
 	public OauthLoginResponse oauthLogin(OauthLoginServiceRequest request) throws JsonProcessingException {
 		OauthApiClient client = clients.get(request.snsType());
-		String accessToken = client.getToken(kakaoClientId, kakaoRedirectUri, request.code(), kakaoClientSecret);
-		String email = client.getEmail(accessToken);
-		String nickname = client.getNickname(accessToken);
+		String KaKaoAccessToken = client.getToken(kakaoClientId, kakaoRedirectUri, request.code(), kakaoClientSecret);
+		String email = client.getEmail(KaKaoAccessToken);
+		String nickname = client.getNickname(KaKaoAccessToken);
 
 		ClientAndStatus result = findOrCreateClient(email, nickname, request.snsType());
 
-		LoginUserInfo userInfo = new LoginUserInfo(result.client().getId(), Role.CLIENT);
-		JwtToken jwtToken = jwtTokenGenerator.generate(userInfo);
+		String accessToken = generateAccessToken(result.client().getId(), Role.CLIENT);
+		return new OauthLoginResponse(accessToken, result.isNew());
+	}
 
-		return new OauthLoginResponse(jwtToken.accessToken(), result.isNew());
+	private String generateAccessToken(UUID userId, Role role) throws JsonProcessingException {
+		LoginUserInfo userInfo = new LoginUserInfo(userId, role);
+		JwtToken jwtToken = jwtTokenGenerator.generate(userInfo);
+		return jwtToken.accessToken();
 	}
 
 	private ClientAndStatus findOrCreateClient(String email, String nickname, SnsType snsType) {
