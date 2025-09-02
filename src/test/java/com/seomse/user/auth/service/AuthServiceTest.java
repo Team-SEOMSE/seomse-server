@@ -2,8 +2,6 @@ package com.seomse.user.auth.service;
 
 import static org.mockito.ArgumentMatchers.*;
 
-import java.util.UUID;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -71,7 +69,7 @@ class AuthServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("이메일 중복 체크를 하고 Role에 따라 맞는 테이블에 저장한다.")
 	@Test
-	void signup() {
+	void signup() throws JsonProcessingException {
 		// given
 		String email = "user@email.com";
 		String password = "abc1234!";
@@ -82,10 +80,10 @@ class AuthServiceTest extends IntegrationTestSupport {
 		SignupServiceRequest request = new SignupServiceRequest(email, password, name, snsType, role);
 
 		// when
-		UUID result = authService.signup(request);
+		LoginResponse response = authService.signup(request);
 
 		// then
-		Assertions.assertThat(result).isNotNull();
+		Assertions.assertThat(response.accessToken()).isNotNull();
 	}
 
 	@DisplayName("회원가입 시 이메일이 중복이면 예외처리를 한다.")
@@ -108,7 +106,7 @@ class AuthServiceTest extends IntegrationTestSupport {
 		// when // then
 		Assertions.assertThatThrownBy(() -> authService.signup(request))
 			.isInstanceOf(DuplicateEmailException.class)
-			.hasMessage("이미 사용 중인 이메일입니다: " + email);
+			.hasMessage("This email is already in use: " + email);
 	}
 
 	@DisplayName("이메일 중복 체크를 한다.")

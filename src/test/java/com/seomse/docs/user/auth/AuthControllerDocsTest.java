@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -131,7 +130,12 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 		SignupRequest request = new SignupRequest("user@email.com", "abc1234!", "김섬세", SnsType.NORMAL, Role.CLIENT);
 
 		given(authService.signup(any(SignupServiceRequest.class)))
-			.willReturn(UUID.randomUUID());
+			.willReturn(new LoginResponse(
+				"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VySWRcIjpcImY4MWQ0ZmFlLTdkZWMtMTFkMC1hNzY1LTAwYTBjO"
+					+ "TFlNmJmNlwiLFwicm9sZVwiOlwiQ0xJRU5UXCJ9IiwiZXhwIjoxNzU1OTY3MTA4LCJVVUlEIjoiOTdhOWRlMWItNGFiNS00"
+					+ "N2E1LWJkMDktMTc5MGUxMDc4NWY1In0.Fz9O6EfhonoWspVddRofnw7IoXCmkXrgseSCZajMU1-OqYXxq82I_U1x9Xfgc9z"
+					+ "cYv-pHLKMTJXGqoTegWuN4A")
+			);
 
 		// when // then
 		mockMvc.perform(
@@ -155,7 +159,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 				),
 				responseFields(
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("코드"),
-					fieldWithPath("data").type(JsonFieldType.STRING).description("응답 데이터, 저장된 사용자 ID")
+					fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("인증 토큰")
 				)
 			));
 	}

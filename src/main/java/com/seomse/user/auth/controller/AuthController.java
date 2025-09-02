@@ -1,7 +1,5 @@
 package com.seomse.user.auth.controller;
 
-import java.util.UUID;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +36,7 @@ public class AuthController {
 
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/signup")
-	public ApiResponse<UUID> signup(@Valid @RequestBody SignupRequest request) {
+	public ApiResponse<LoginResponse> signup(@Valid @RequestBody SignupRequest request) throws JsonProcessingException {
 		return ApiResponse.created(authService.signup(request.toServiceRequest()));
 	}
 
