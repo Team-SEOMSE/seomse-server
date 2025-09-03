@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtTokenGenerator {
 
 	private static final String BEARER_TYPE = "Bearer";
-	private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;  // 60 minutes ( * 24)
+	private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 60 minutes ( * 24 * 7) // 7 days
 	private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 15;  // 15 days
 
 	private final ObjectMapper objectMapper;
