@@ -31,7 +31,7 @@ public class ReviewQueryRepository {
 				reviewEntity.rating,
 				reviewEntity.content,
 				reviewEntity.image,
-				shopEntity.shopName,
+				shopEntity.name,
 				designerEntity.nickName,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate
@@ -53,7 +53,7 @@ public class ReviewQueryRepository {
 				reviewEntity.rating,
 				reviewEntity.content,
 				reviewEntity.image,
-				shopEntity.shopName,
+				shopEntity.name,
 				designerEntity.nickName,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate
