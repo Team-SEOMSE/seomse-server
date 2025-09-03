@@ -2,6 +2,8 @@ package com.seomse.security.config;
 
 import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.*;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,10 +17,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.seomse.security.SecurityConstants;
 import com.seomse.security.jwt.JwtTokenProvider;
 import com.seomse.security.jwt.filter.JwtAuthenticationFilter;
+import com.seomse.security.jwt.filter.JwtExceptionHandlerFilter;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -48,26 +51,15 @@ public class SecurityConfig {
 				.anyRequest().hasAnyAuthority("USER")
 			)
 
-			.exceptionHandling(ex -> ex
-				.authenticationEntryPoint((req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-				.accessDeniedHandler((req, res, e) -> res.sendError(HttpServletResponse.SC_FORBIDDEN))
-			)
-
-			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-		// .addFilterBefore(new JwtExceptionHandlerFilter(), JwtAuthenticationFilter.class);
+			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new JwtExceptionHandlerFilter(), JwtAuthenticationFilter.class);
 
 		return http.build();
 	}
 
 	private RequestMatcher[] getPublicMatchers() {
-		Builder pathPattern = withDefaults();
-		return new RequestMatcher[] {
-			pathPattern.matcher("/user/auth/**"),
-			pathPattern.matcher("/h2-console/**"),
-			pathPattern.matcher("/docs/**"),
-			pathPattern.matcher("/v3/api-docs/**"),
-			pathPattern.matcher("/error"),
-			pathPattern.matcher("/health-check")
-		};
+		return Arrays.stream(SecurityConstants.PUBLIC_PATHS)
+			.map(path -> withDefaults().matcher(path))
+			.toArray(RequestMatcher[]::new);
 	}
 }

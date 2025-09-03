@@ -1,6 +1,7 @@
 package com.seomse.s3.service;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +18,13 @@ public class S3Service {
 
 	private final S3Client s3Client;
 
+	@Value("${s3.cloud-front}")
+	private String cloudFrontDomain;
+
 	@Value("${s3.bucket}")
 	private String bucket;
 
-	public String upload(MultipartFile file) throws IOException {
+	public String upload(MultipartFile file, String folder) throws IOException {
 		if (file == null || file.isEmpty()) {
 			throw new IllegalArgumentException("File is missing.");
 		}
@@ -31,7 +35,12 @@ public class S3Service {
 		}
 
 		String extension = getExtension(file.getOriginalFilename());
-		String key = UUID.randomUUID() + "." + extension;
+		String fileName = UUID.randomUUID() + "." + extension;
+
+		String key = Optional.ofNullable(folder)
+			.filter(f -> !f.isBlank())
+			.map(f -> f + "/" + fileName)
+			.orElse(fileName);
 
 		s3Client.putObject(
 			builder -> builder.bucket(bucket).key(key)
@@ -39,7 +48,7 @@ public class S3Service {
 			RequestBody.fromInputStream(file.getInputStream(), file.getSize())
 		);
 
-		return key;
+		return cloudFrontDomain + "/" + key;
 	}
 
 	private String getExtension(String fileName) {

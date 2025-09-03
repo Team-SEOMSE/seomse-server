@@ -1,11 +1,13 @@
 package com.seomse.security.jwt.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.seomse.security.SecurityConstants;
 import com.seomse.security.jwt.JwtTokenProvider;
 import com.seomse.security.jwt.exception.JwtTokenException;
 
@@ -20,6 +22,13 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) {
+		String path = request.getServletPath();
+		return Arrays.stream(SecurityConstants.PUBLIC_PATHS)
+			.anyMatch(p -> path.startsWith(p.replace("/**", "")));
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

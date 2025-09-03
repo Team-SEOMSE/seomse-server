@@ -31,7 +31,7 @@ class S3ServiceTest extends IntegrationTestSupport {
 		);
 
 		// when
-		String uploadedKey = s3Service.upload(mockFile);
+		String uploadedKey = s3Service.upload(mockFile, null);
 
 		// then
 		Assertions.assertThat(uploadedKey).isNotNull();
