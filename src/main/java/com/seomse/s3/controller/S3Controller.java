@@ -22,7 +22,7 @@ public class S3Controller {
 
 	@PostMapping("/upload")
 	public ApiResponse<String> upload(@RequestParam("file") MultipartFile file) throws IOException {
-		String key = s3Service.upload(file);
+		String key = s3Service.upload(file, null);
 		return ApiResponse.ok(key);
 	}
 }

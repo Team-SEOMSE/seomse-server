@@ -41,8 +41,9 @@ public class ReviewService {
 
 		String s3Key = null;
 		if (reviewImage != null && !reviewImage.isEmpty()) {
+			final String S3_FOLDER = "review";
 			try {
-				s3Key = s3Service.upload(reviewImage);
+				s3Key = s3Service.upload(reviewImage, S3_FOLDER);
 			} catch (IOException e) {
 				throw new RuntimeException("Failed to upload review image.", e);
 			}
