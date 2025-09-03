@@ -28,7 +28,7 @@ public class AppointmentQueryRepository {
 		return jpaQueryFactory
 			.select(Projections.constructor(AppointmentListResponse.class,
 				appointmentEntity.id,
-				shopEntity.shopName,
+				shopEntity.name,
 				designerEntity.nickName,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate
@@ -45,7 +45,7 @@ public class AppointmentQueryRepository {
 		return jpaQueryFactory
 			.select(Projections.constructor(AppointmentListResponse.class,
 				appointmentEntity.id,
-				shopEntity.shopName,
+				shopEntity.name,
 				designerEntity.nickName,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate
@@ -62,7 +62,7 @@ public class AppointmentQueryRepository {
 		return jpaQueryFactory
 			.select(Projections.constructor(AppointmentListResponse.class,
 				appointmentEntity.id,
-				shopEntity.shopName,
+				shopEntity.name,
 				designerEntity.nickName,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate

@@ -9,5 +9,5 @@ import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.enums.Type;
 
 public interface ShopRepository extends JpaRepository<ShopEntity, UUID> {
-	List<ShopEntity> findAllByShopType(Type type);
+	List<ShopEntity> findAllByType(Type type);
 }

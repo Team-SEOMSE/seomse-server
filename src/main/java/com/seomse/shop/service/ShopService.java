@@ -26,14 +26,14 @@ public class ShopService {
 	private final ShopQueryRepository shopQueryRepository;
 
 	public List<ShopListResponse> getShopList(Type type) {
-		List<ShopEntity> shopList = shopRepository.findAllByShopType(type);
+		List<ShopEntity> shopList = shopRepository.findAllByType(type);
 		return shopList.stream()
 			.map(shop -> new ShopListResponse(
 				shop.getId(),
-				shop.getShopType(),
-				shop.getShopName(),
-				shop.getShopInfo(),
-				shop.getShopImage()
+				shop.getType(),
+				shop.getName(),
+				shop.getInfo(),
+				shop.getImage()
 			))
 			.toList();
 	}
@@ -43,10 +43,10 @@ public class ShopService {
 			.orElseThrow(() -> new EntityNotFoundException("Shop not found."));
 
 		return new ShopDetailResponse(
-			shopDesigners.shop().getShopType(),
-			shopDesigners.shop().getShopName(),
-			shopDesigners.shop().getShopInfo(),
-			shopDesigners.shop().getShopImage(),
+			shopDesigners.shop().getType(),
+			shopDesigners.shop().getName(),
+			shopDesigners.shop().getInfo(),
+			shopDesigners.shop().getImage(),
 			shopDesigners.designers()
 		);
 	}

@@ -41,23 +41,22 @@ public class ShopEntity extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private Type shopType;
+	private Type type;
 
 	@Column(nullable = false, length = 50)
-	private String shopName;
+	private String name;
 
 	@Column(length = 100)
-	private String shopInfo;
+	private String info;
 
 	@Column(length = 190)
-	private String shopImage;
+	private String image;
 
-	public ShopEntity(OwnerEntity owner, Type shopType, String shopName,
-		String shopInfo, String shopImage) {
+	public ShopEntity(OwnerEntity owner, Type type, String name, String info, String image) {
 		this.owner = owner;
-		this.shopType = shopType;
-		this.shopName = shopName;
-		this.shopInfo = shopInfo;
-		this.shopImage = shopImage;
+		this.type = type;
+		this.name = name;
+		this.info = info;
+		this.image = image;
 	}
 }
