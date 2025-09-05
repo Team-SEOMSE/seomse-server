@@ -183,7 +183,7 @@ class ShopServiceTest extends IntegrationTestSupport {
 
 		// 디자이너 데이터 매핑
 		assertThat(response.designers()).hasSize(2)
-			.extracting(DesignerInfoDto::nickName)
+			.extracting(DesignerInfoDto::nickname)
 			.containsExactlyInAnyOrder("designerNickName10", "designerNickName11");
 	}
 

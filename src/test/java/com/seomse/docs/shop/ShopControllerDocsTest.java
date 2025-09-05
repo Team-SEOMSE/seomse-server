@@ -102,7 +102,7 @@ public class ShopControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("data.shopInfo").type(JsonFieldType.STRING).description("샵 위치, 전화번호, 소개글"),
 					fieldWithPath("data.shopImage").type(JsonFieldType.STRING).description("샵 이미지"),
 					fieldWithPath("data.designers[].designerId").type(JsonFieldType.STRING).description("디자이너 UUID"),
-					fieldWithPath("data.designers[].nickName").type(JsonFieldType.STRING).description("디자이너 닉네임")
+					fieldWithPath("data.designers[].nickname").type(JsonFieldType.STRING).description("디자이너 닉네임")
 				)
 			));
 	}
