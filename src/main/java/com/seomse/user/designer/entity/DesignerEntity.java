@@ -35,11 +35,11 @@ public class DesignerEntity extends BaseTimeEntity {
 	private String password;
 
 	@Column(nullable = false, length = 60)
-	private String nickName;
+	private String nickname;
 
-	public DesignerEntity(String email, String password, String nickName) {
+	public DesignerEntity(String email, String password, String nickname) {
 		this.email = email;
 		this.password = password;
-		this.nickName = nickName;
+		this.nickname = nickname;
 	}
 }

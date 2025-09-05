@@ -29,7 +29,7 @@ public class AppointmentQueryRepository {
 			.select(Projections.constructor(AppointmentListResponse.class,
 				appointmentEntity.id,
 				shopEntity.name,
-				designerEntity.nickName,
+				designerEntity.nickname,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate
 			))
@@ -46,7 +46,7 @@ public class AppointmentQueryRepository {
 			.select(Projections.constructor(AppointmentListResponse.class,
 				appointmentEntity.id,
 				shopEntity.name,
-				designerEntity.nickName,
+				designerEntity.nickname,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate
 			))
@@ -63,7 +63,7 @@ public class AppointmentQueryRepository {
 			.select(Projections.constructor(AppointmentListResponse.class,
 				appointmentEntity.id,
 				shopEntity.name,
-				designerEntity.nickName,
+				designerEntity.nickname,
 				appointmentEntity.serviceName,
 				appointmentEntity.createdDate
 			))

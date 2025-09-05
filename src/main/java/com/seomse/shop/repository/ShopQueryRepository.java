@@ -41,7 +41,7 @@ public class ShopQueryRepository {
 		List<DesignerInfoDto> designerInfos = jpaQueryFactory
 			.select(Projections.constructor(DesignerInfoDto.class,
 				designerEntity.id,
-				designerEntity.nickName
+				designerEntity.nickname
 			))
 			.from(designerShopEntity)
 			.join(designerShopEntity.designer, designerEntity)
