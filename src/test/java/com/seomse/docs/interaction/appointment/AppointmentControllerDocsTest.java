@@ -19,7 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 
@@ -81,8 +80,6 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 				multipart("/interaction/appointments")
 					.file(requestPart)
 					.file(imagePart)
-					.content(objectMapper.writeValueAsString(request))
-					.contentType(MediaType.APPLICATION_JSON)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isCreated())
