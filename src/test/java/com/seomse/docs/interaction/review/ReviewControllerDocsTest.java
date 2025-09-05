@@ -18,7 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 
@@ -66,7 +65,6 @@ public class ReviewControllerDocsTest extends RestDocsSupport {
 				multipart("/interaction/reviews")
 					.file(requestPart)
 					.file(imagePart)
-					.contentType(MediaType.MULTIPART_FORM_DATA)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isCreated())
