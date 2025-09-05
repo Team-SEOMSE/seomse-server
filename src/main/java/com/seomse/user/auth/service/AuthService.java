@@ -20,6 +20,7 @@ import com.seomse.security.jwt.dto.JwtToken;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.auth.service.dto.ClientAndStatus;
+import com.seomse.user.auth.service.dto.UserAuthInfo;
 import com.seomse.user.auth.service.request.EmailCheckServiceRequest;
 import com.seomse.user.auth.service.request.LoginServiceRequest;
 import com.seomse.user.auth.service.request.OauthLoginServiceRequest;
@@ -30,6 +31,8 @@ import com.seomse.user.auth.service.response.OauthLoginResponse;
 import com.seomse.user.client.entity.ClientEntity;
 import com.seomse.user.client.enums.SnsType;
 import com.seomse.user.client.repository.ClientRepository;
+import com.seomse.user.designer.repository.DesignerRepository;
+import com.seomse.user.owner.repository.OwnerRepository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +49,8 @@ public class AuthService {
 	private Map<SnsType, OauthApiClient> clients;
 
 	private final ClientRepository clientRepository;
+	private final DesignerRepository designerRepository;
+	private final OwnerRepository ownerRepository;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
 	private String kakaoClientId;
@@ -64,14 +69,27 @@ public class AuthService {
 	}
 
 	public LoginResponse normalLogin(LoginServiceRequest request) throws JsonProcessingException {
-		ClientEntity client = clientRepository.findByEmail(request.email())
-			.orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
 
-		if (!bCryptPasswordEncoder.matches(request.password(), client.getPassword())) {
-			throw new IllegalArgumentException("Invalid email or password.");
+		final String INVALID_CREDENTIALS_MESSAGE = "Invalid email or password.";
+
+		UserAuthInfo authInfo = switch (request.role()) {
+			case CLIENT -> clientRepository.findByEmail(request.email())
+				.map(user -> new UserAuthInfo(user.getId(), user.getPassword()))
+				.orElseThrow(() -> new IllegalArgumentException(INVALID_CREDENTIALS_MESSAGE));
+			case DESIGNER -> designerRepository.findByEmail(request.email())
+				.map(user -> new UserAuthInfo(user.getId(), user.getPassword()))
+				.orElseThrow(() -> new IllegalArgumentException(INVALID_CREDENTIALS_MESSAGE));
+			case OWNER -> ownerRepository.findByEmail(request.email())
+				.map(user -> new UserAuthInfo(user.getId(), user.getPassword()))
+				.orElseThrow(() -> new IllegalArgumentException(INVALID_CREDENTIALS_MESSAGE));
+		};
+
+		if (!bCryptPasswordEncoder.matches(request.password(), authInfo.encryptedPassword())) {
+			throw new IllegalArgumentException(INVALID_CREDENTIALS_MESSAGE);
 		}
 
-		String accessToken = generateAccessToken(client.getId(), Role.CLIENT);
+		String accessToken = generateAccessToken(authInfo.id(), request.role());
+
 		return new LoginResponse(accessToken);
 	}
 
