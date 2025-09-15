@@ -183,11 +183,11 @@ class ShopServiceTest extends IntegrationTestSupport {
 	@Test
 	void getShopDetail_whenDesignerNotExists_thenReturnEmptyList() {
 		// given
-		// owner1
+		// owner
 		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
-		// shop1
+		// shop
 		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 

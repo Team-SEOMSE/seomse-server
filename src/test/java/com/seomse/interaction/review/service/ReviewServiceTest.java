@@ -18,6 +18,7 @@ import com.seomse.IntegrationTestSupport;
 import com.seomse.fixture.interaction.appointment.AppointmentFixture;
 import com.seomse.fixture.interaction.review.ReviewFixture;
 import com.seomse.fixture.shop.ShopFixture;
+import com.seomse.fixture.user.client.ClientFixture;
 import com.seomse.fixture.user.designer.DesignerFixture;
 import com.seomse.fixture.user.owner.OwnerFixture;
 import com.seomse.interaction.appointment.entity.AppointmentEntity;
@@ -33,7 +34,6 @@ import com.seomse.shop.repository.DesignerShopRepository;
 import com.seomse.shop.repository.ShopRepository;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.client.entity.ClientEntity;
-import com.seomse.user.client.enums.SnsType;
 import com.seomse.user.client.repository.ClientRepository;
 import com.seomse.user.designer.entity.DesignerEntity;
 import com.seomse.user.designer.repository.DesignerRepository;
@@ -104,13 +104,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		String email = "user@email.com";
-		String password = "abc1234!";
-		String name = "김섬세";
-		SnsType snsType = SnsType.NORMAL;
-
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
-			null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment
@@ -158,13 +152,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		String email = "user@email.com";
-		String password = "abc1234!";
-		String name = "김섬세";
-		SnsType snsType = SnsType.NORMAL;
-
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
-			null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment
@@ -233,13 +221,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		String email = "user@email.com";
-		String password = "abc1234!";
-		String name = "김섬세";
-		SnsType snsType = SnsType.NORMAL;
-
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
-			null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -281,13 +263,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		String email = "user@email.com";
-		String password = "abc1234!";
-		String name = "김섬세";
-		SnsType snsType = SnsType.NORMAL;
-
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
-			null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment
@@ -337,13 +313,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		String email = "user@email.com";
-		String password = "abc1234!";
-		String name = "김섬세";
-		SnsType snsType = SnsType.NORMAL;
-
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
-			null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment

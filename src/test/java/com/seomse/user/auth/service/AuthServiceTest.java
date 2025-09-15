@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.seomse.IntegrationTestSupport;
 import com.seomse.common.exception.DuplicateEmailException;
+import com.seomse.fixture.user.client.ClientFixture;
 import com.seomse.security.feign.kakao.response.KakaoTokenResponse;
 import com.seomse.security.feign.kakao.response.KakaoUserInfoResponse;
 import com.seomse.user.auth.enums.Role;
@@ -113,17 +114,11 @@ class AuthServiceTest extends IntegrationTestSupport {
 	@Test
 	void emailExists() {
 		// given
-		String email = "user@email.com";
-		String password = "abc1234!";
-		String name = "김섬세";
-		SnsType snsType = SnsType.NORMAL;
-		Role role = Role.CLIENT;
-
-		ClientEntity client = new ClientEntity(email, bCryptPasswordEncoder.encode(password), name, snsType, null,
-			null);
-
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
+		String email = "user@email.com";
+		Role role = Role.CLIENT;
 		EmailCheckServiceRequest request = new EmailCheckServiceRequest(email, role);
 
 		// when // then

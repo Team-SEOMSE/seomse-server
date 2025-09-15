@@ -19,6 +19,7 @@ import com.seomse.IntegrationTestSupport;
 import com.seomse.fixture.interaction.appointment.AppointmentDetailFixture;
 import com.seomse.fixture.interaction.appointment.AppointmentFixture;
 import com.seomse.fixture.shop.ShopFixture;
+import com.seomse.fixture.user.client.ClientFixture;
 import com.seomse.fixture.user.designer.DesignerFixture;
 import com.seomse.fixture.user.owner.OwnerFixture;
 import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
@@ -39,7 +40,6 @@ import com.seomse.shop.repository.DesignerShopRepository;
 import com.seomse.shop.repository.ShopRepository;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.client.entity.ClientEntity;
-import com.seomse.user.client.enums.SnsType;
 import com.seomse.user.client.repository.ClientRepository;
 import com.seomse.user.designer.entity.DesignerEntity;
 import com.seomse.user.designer.repository.DesignerRepository;
@@ -110,8 +110,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -172,8 +171,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -295,8 +293,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerRepository.save(designer);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -342,8 +339,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment
@@ -386,8 +382,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment
@@ -431,8 +426,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment
@@ -476,8 +470,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		// appointment
@@ -535,8 +528,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		designerShopRepository.save(designerShop);
 
 		// client
-		ClientEntity client = new ClientEntity("user@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -566,8 +558,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenInvalidAppointmentId_whenGetLatestAppointment_thenThrowException() {
 		// given
-		ClientEntity client = new ClientEntity("nouser@email.com", bCryptPasswordEncoder.encode("abc1234!"), "김섬세",
-			SnsType.NORMAL, null, null);
+		ClientEntity client = ClientFixture.createClient();
 		clientRepository.save(client);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
