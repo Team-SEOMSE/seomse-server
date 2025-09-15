@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.seomse.IntegrationTestSupport;
+import com.seomse.fixture.shop.ShopFixture;
+import com.seomse.fixture.user.owner.OwnerFixture;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.review.repository.ReviewRepository;
 import com.seomse.shop.entity.DesignerShopEntity;
@@ -134,23 +136,13 @@ class ShopServiceTest extends IntegrationTestSupport {
 	@Test
 	void getShopDetail_whenExists_thenReturnShopAndDesigner() {
 		//given
-		// owner1
-		String ownerEmail1 = "user1@email.com";
-		String ownerPassword1 = "abc1234!";
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
 
-		OwnerEntity owner1 = new OwnerEntity(ownerEmail1, ownerPassword1);
-
-		ownerRepository.save(owner1);
-
-		// shop1
-		Type shopType1 = Type.HAIR_SALON;
-		String shopName1 = "shopName1";
-		String shopInfo1 = "info1";
-		String shopImage1 = "/img1.png";
-
-		ShopEntity shop1 = new ShopEntity(owner1, shopType1, shopName1, shopInfo1, shopImage1);
-
-		shopRepository.save(shop1);
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
 
 		// designer10
 		String designerEmail10 = "designer10@email.com";
@@ -170,16 +162,16 @@ class ShopServiceTest extends IntegrationTestSupport {
 
 		designerRepository.save(designer11);
 
-		// designerShop1
-		designerShopRepository.save(new DesignerShopEntity(designer10, shop1));
-		designerShopRepository.save(new DesignerShopEntity(designer11, shop1));
+		// designerShop
+		designerShopRepository.save(new DesignerShopEntity(designer10, shop));
+		designerShopRepository.save(new DesignerShopEntity(designer11, shop));
 
 		//when
-		ShopDetailResponse response = shopService.getShopDetail(shop1.getId());
+		ShopDetailResponse response = shopService.getShopDetail(shop.getId());
 
 		//then
 		// 샵 이름
-		assertThat(response.shopName()).isEqualTo("shopName1");
+		assertThat(response.shopName()).isEqualTo("shopName");
 
 		// 디자이너 데이터 매핑
 		assertThat(response.designers()).hasSize(2)
@@ -191,26 +183,16 @@ class ShopServiceTest extends IntegrationTestSupport {
 	@Test
 	void getShopDetail_whenDesignerNotExists_thenReturnEmptyList() {
 		// given
-		// owner1
-		String ownerEmail1 = "user1@email.com";
-		String ownerPassword1 = "abc1234!";
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
 
-		OwnerEntity owner1 = new OwnerEntity(ownerEmail1, ownerPassword1);
-
-		ownerRepository.save(owner1);
-
-		// shop1
-		Type shopType1 = Type.HAIR_SALON;
-		String shopName1 = "shopName1";
-		String shopInfo1 = "info1";
-		String shopImage1 = "/img1.png";
-
-		ShopEntity shop1 = new ShopEntity(owner1, shopType1, shopName1, shopInfo1, shopImage1);
-
-		shopRepository.save(shop1);
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
 
 		// when
-		ShopDetailResponse response = shopService.getShopDetail(shop1.getId());
+		ShopDetailResponse response = shopService.getShopDetail(shop.getId());
 
 		// then
 		assertThat(response.designers()).isEmpty();
