@@ -16,6 +16,11 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.seomse.IntegrationTestSupport;
+import com.seomse.fixture.interaction.appointment.AppointmentDetailFixture;
+import com.seomse.fixture.interaction.appointment.AppointmentFixture;
+import com.seomse.fixture.shop.ShopFixture;
+import com.seomse.fixture.user.designer.DesignerFixture;
+import com.seomse.fixture.user.owner.OwnerFixture;
 import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
 import com.seomse.interaction.appointment.entity.AppointmentDetailEntity;
 import com.seomse.interaction.appointment.entity.AppointmentEntity;
@@ -30,7 +35,6 @@ import com.seomse.interaction.appointment.service.response.AppointmentListRespon
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.entity.ShopEntity;
-import com.seomse.shop.enums.Type;
 import com.seomse.shop.repository.DesignerShopRepository;
 import com.seomse.shop.repository.ShopRepository;
 import com.seomse.user.auth.enums.Role;
@@ -90,15 +94,15 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	void givenValidRequestWithoutImage_whenCreateAppointment_thenReturnAppointmentId() {
 		// given
 		// owner
-		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
 		// shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// designerShop
@@ -152,15 +156,15 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	void givenValidRequestWithImage_whenCreateAppointment_thenReturnAppointmentId() throws IOException {
 		// given
 		// owner
-		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
 		// shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// designerShop
@@ -235,19 +239,19 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenInvalidClientId_whenCreateAppointment_thenThrowUserNotFoundException() {
 		//given
-		// Owner
-		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
-		// Shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
-		// Designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
-		// DesignerShop
+		// designerShop
 		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
 		designerShopRepository.save(designerShop);
 
@@ -278,16 +282,16 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenInvalidDesignerId_whenCreateAppointment_thenThrowDesignerShopNotFoundException() {
 		//given
-		// Owner
-		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
-		// Shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// client
@@ -321,16 +325,16 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnClientAppointmentList() {
 		//given
-		// Owner
-		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
-		// Shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// DesignerShop
@@ -343,8 +347,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		String serviceName = "serviceName";
-		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -356,8 +359,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		//then
 		assertThat(appointmentList).hasSize(1);
 		assertThat(appointmentList.get(0).appointmentId()).isEqualTo(appointment.getId());
-		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName1");
-		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName10");
+		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
+		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
 		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
 	}
@@ -366,16 +369,16 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnOwnerAppointmentList() {
 		//given
-		// Owner
-		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
-		// Shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// DesignerShop
@@ -388,8 +391,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		String serviceName = "serviceName";
-		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(owner.getId(), Role.OWNER);
@@ -402,8 +404,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		// response
 		assertThat(appointmentList).hasSize(1);
 		assertThat(appointmentList.get(0).appointmentId()).isEqualTo(appointment.getId());
-		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName1");
-		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName10");
+		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
+		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
 		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
 	}
@@ -412,16 +414,16 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnDesignerAppointmentList() {
 		//given
-		// Owner
-		OwnerEntity owner = new OwnerEntity("owner@email.com", "abc1234!");
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
-		// Shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// DesignerShop
@@ -434,8 +436,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		String serviceName = "serviceName";
-		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.DESIGNER);
@@ -448,8 +449,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		// response
 		assertThat(appointmentList).hasSize(1);
 		assertThat(appointmentList.get(0).appointmentId()).isEqualTo(appointment.getId());
-		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName1");
-		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName10");
+		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
+		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
 		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
 	}
@@ -459,15 +460,15 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	void givenValidAppointmentId_whenGetAppointment_thenReturnDetailResponse() {
 		// given
 		// owner
-		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
 		// shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// designerShop
@@ -480,21 +481,11 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		String serviceName = "serviceName";
-
-		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
 		appointmentRepository.save(appointment);
 
 		// appointmentDetail
-		ScaleType scaleType = ScaleType.DRY;
-		HairType hairType = HairType.CURLY;
-		HairLength hairLength = HairLength.MEDIUM;
-		HairTreatmentType hairTreatmentType = HairTreatmentType.BLEACH;
-		String requirements = "requirements";
-		String requirementsImage = "/image.png";
-
-		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, scaleType, hairType,
-			hairLength, hairTreatmentType, requirements, requirementsImage);
+		AppointmentDetailEntity appointmentDetail = AppointmentDetailFixture.createAppointmentDetailEntity(appointment);
 		appointmentDetailRepository.save(appointmentDetail);
 
 		UUID appointmentId = appointmentDetail.getAppointment().getId();
@@ -528,15 +519,15 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	void givenValidAppointmentId_whenGetLatestAppointment_thenReturnLatestDetailResponse() {
 		// given
 		// owner
-		OwnerEntity owner = new OwnerEntity("user1@email.com", "abc1234!");
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
 		ownerRepository.save(owner);
 
 		// shop
-		ShopEntity shop = new ShopEntity(owner, Type.HAIR_SALON, "shopName1", "info1", "/img1.png");
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
 		shopRepository.save(shop);
 
 		// designer
-		DesignerEntity designer = new DesignerEntity("designer10@email.com", "designer101234!", "designerNickName10");
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
 		designerRepository.save(designer);
 
 		// designerShop
@@ -552,21 +543,11 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		// appointment
-		String serviceName = "serviceName";
-
-		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, serviceName);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
 		appointmentRepository.save(appointment);
 
 		// appointmentDetail
-		ScaleType scaleType = ScaleType.DRY;
-		HairType hairType = HairType.CURLY;
-		HairLength hairLength = HairLength.MEDIUM;
-		HairTreatmentType hairTreatmentType = HairTreatmentType.BLEACH;
-		String requirements = "requirements";
-		String requirementsImage = "/image.png";
-
-		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, scaleType, hairType,
-			hairLength, hairTreatmentType, requirements, requirementsImage);
+		AppointmentDetailEntity appointmentDetail = AppointmentDetailFixture.createAppointmentDetailEntity(appointment);
 		appointmentDetailRepository.save(appointmentDetail);
 
 		// when
