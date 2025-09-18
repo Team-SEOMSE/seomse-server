@@ -24,7 +24,8 @@ import com.seomse.fixture.shop.ShopFixture;
 import com.seomse.fixture.user.client.ClientFixture;
 import com.seomse.fixture.user.designer.DesignerFixture;
 import com.seomse.fixture.user.owner.OwnerFixture;
-import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.NormalAppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.SpecialAppointmentCreateRequest;
 import com.seomse.interaction.appointment.entity.AppointmentDetailEntity;
 import com.seomse.interaction.appointment.entity.AppointmentEntity;
 import com.seomse.interaction.appointment.enums.HairLength;
@@ -91,7 +92,181 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		clientRepository.deleteAll();
 	}
 
-	@DisplayName("헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 없음)")
+	@DisplayName("normal 헤어 예약 생성 시, 존재하지 않는 Client ID로 예약을 생성하면 예외가 발생한다.")
+	@Test
+	void givenInvalidClientId_whenCreateNormalAppointment_thenThrowUserNotFoundException() {
+		//given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		UUID nonExistClientId = UUID.randomUUID();
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(nonExistClientId, Role.CLIENT);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		//request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
+		NormalAppointmentCreateRequest request = new NormalAppointmentCreateRequest(
+			shop.getId(),
+			designerShop.getDesigner().getId(),
+			testDate,
+			testTime,
+			"커트"
+		);
+		//when
+		//then
+		assertThatThrownBy(() -> appointmentService.createNormalAppointment(request))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("User not found.");
+	}
+
+	@DisplayName("normal 헤어 예약 생성 시, 존재하지 않는 디자이너 ID로 예약을 생성하면 예외가 발생한다.")
+	@Test
+	void givenInvalidDesignerId_whenCreateNormalAppointment_thenThrowDesignerShopNotFoundException() {
+		//given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		//request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
+		NormalAppointmentCreateRequest request = new NormalAppointmentCreateRequest(
+			shop.getId(),
+			designer.getId(),
+			testDate,
+			testTime,
+			"커트"
+		);
+		//when
+		//then
+		assertThatThrownBy(() -> appointmentService.createNormalAppointment(request))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("DesignerShop not found.");
+	}
+
+	@DisplayName("normal 헤어 예약 생성 시, 과거 날짜/시간이면 예외가 발생한다.")
+	@Test
+	void givenPastDateTime_whenCreateNormalAppointment_thenThrowIllegalStateException() {
+		// given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// request
+		LocalDate testDate = LocalDate.now().minusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
+		NormalAppointmentCreateRequest request = new NormalAppointmentCreateRequest(
+			shop.getId(),
+			designer.getId(),
+			testDate,
+			testTime,
+			"커트"
+		);
+
+		// when & then
+		assertThatThrownBy(() -> appointmentService.createNormalAppointment(request))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("Appointment date must be after today.");
+	}
+
+	@DisplayName("normal 헤어 예약 생성 시, 동일한 날짜/시간에 이미 예약이 있으면 예외가 발생한다.")
+	@Test
+	void givenDuplicateDateTime_whenCreateNormalAppointment_thenThrowIllegalStateException() {
+		// given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		// appointment
+		AppointmentEntity existedAppointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		appointmentRepository.save(existedAppointment);
+
+		// request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
+		NormalAppointmentCreateRequest request = new NormalAppointmentCreateRequest(
+			shop.getId(),
+			designer.getId(),
+			testDate,
+			testTime,
+			"커트"
+		);
+
+		// when & then
+		assertThatThrownBy(() -> appointmentService.createNormalAppointment(request))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("Appointment already exists.");
+	}
+
+	@DisplayName("special 헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 없음)")
 	@Test
 	void givenValidRequestWithoutImage_whenCreateAppointment_thenReturnAppointmentId() {
 		// given
@@ -123,21 +298,21 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		LocalDate testDate = LocalDate.now().plusDays(1);
 		LocalTime testTime = LocalTime.of(12, 0);
 
-		AppointmentCreateRequest request = new AppointmentCreateRequest(
+		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
 			shop.getId(),
 			designerShop.getDesigner().getId(),
+			testDate,
+			testTime,
 			"커트",
 			ScaleType.DRY,
 			HairType.CURLY,
 			HairLength.MEDIUM,
 			HairTreatmentType.BLEACH,
-			testDate,
-			testTime,
 			"말 걸지 말아주세요."
 		);
 
 		// when
-		UUID appointmentId = appointmentService.createAppointment(request, null);
+		UUID appointmentId = appointmentService.createSpecialAppointment(request, null);
 
 		// then
 		// appointment
@@ -159,7 +334,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentDetail.getRequirementsImage()).isNull();
 	}
 
-	@DisplayName("헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 있음)")
+	@DisplayName("special 헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 있음)")
 	@Test
 	void givenValidRequestWithImage_whenCreateAppointment_thenReturnAppointmentId() throws IOException {
 		// given
@@ -191,16 +366,16 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		LocalDate testDate = LocalDate.now().plusDays(1);
 		LocalTime testTime = LocalTime.of(12, 0);
 
-		AppointmentCreateRequest request = new AppointmentCreateRequest(
+		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
 			shop.getId(),
 			designerShop.getDesigner().getId(),
+			testDate,
+			testTime,
 			"커트",
 			ScaleType.DRY,
 			HairType.CURLY,
 			HairLength.MEDIUM,
 			HairTreatmentType.BLEACH,
-			testDate,
-			testTime,
 			"말 걸지 말아주세요."
 		);
 
@@ -220,7 +395,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 
 		// when
 		// appointment
-		UUID appointmentId = appointmentService.createAppointment(request, fakeRequirementsImage);
+		UUID appointmentId = appointmentService.createSpecialAppointment(request, fakeRequirementsImage);
 
 		// then
 		// appointment
@@ -247,194 +422,6 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			any(Consumer.class),
 			any(RequestBody.class)
 		);
-	}
-
-	@DisplayName("존재하지 않는 Client ID로 예약을 생성하면 예외가 발생한다.")
-	@Test
-	void givenInvalidClientId_whenCreateAppointment_thenThrowUserNotFoundException() {
-		//given
-		// owner
-		OwnerEntity owner = OwnerFixture.createOwnerEntity();
-		ownerRepository.save(owner);
-
-		// shop
-		ShopEntity shop = ShopFixture.createShopEntity(owner);
-		shopRepository.save(shop);
-
-		// designer
-		DesignerEntity designer = DesignerFixture.createDesignerEntity();
-		designerRepository.save(designer);
-
-		// designerShop
-		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
-		designerShopRepository.save(designerShop);
-
-		// client
-		UUID nonExistClientId = UUID.randomUUID();
-		LoginUserInfo fakeLoginUser = new LoginUserInfo(nonExistClientId, Role.CLIENT);
-
-		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
-
-		//request
-		LocalDate testDate = LocalDate.now().plusDays(1);
-		LocalTime testTime = LocalTime.of(12, 0);
-
-		AppointmentCreateRequest request = new AppointmentCreateRequest(
-			shop.getId(),
-			designerShop.getDesigner().getId(),
-			"커트",
-			ScaleType.DRY,
-			HairType.CURLY,
-			HairLength.MEDIUM,
-			HairTreatmentType.BLEACH,
-			testDate,
-			testTime,
-			"말 걸지 말아주세요"
-		);
-		//when
-		//then
-		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("User not found.");
-	}
-
-	@DisplayName("존재하지 않는 디자이너 ID로 예약을 생성하면 예외가 발생한다.")
-	@Test
-	void givenInvalidDesignerId_whenCreateAppointment_thenThrowDesignerShopNotFoundException() {
-		//given
-		// owner
-		OwnerEntity owner = OwnerFixture.createOwnerEntity();
-		ownerRepository.save(owner);
-
-		// shop
-		ShopEntity shop = ShopFixture.createShopEntity(owner);
-		shopRepository.save(shop);
-
-		// designer
-		DesignerEntity designer = DesignerFixture.createDesignerEntity();
-		designerRepository.save(designer);
-
-		// client
-		ClientEntity client = ClientFixture.createClient();
-		clientRepository.save(client);
-
-		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
-
-		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
-
-		//request
-		LocalDate testDate = LocalDate.now().plusDays(1);
-		LocalTime testTime = LocalTime.of(12, 0);
-
-		AppointmentCreateRequest request = new AppointmentCreateRequest(
-			shop.getId(),
-			designer.getId(),
-			"커트",
-			ScaleType.DRY,
-			HairType.CURLY,
-			HairLength.MEDIUM,
-			HairTreatmentType.BLEACH,
-			testDate,
-			testTime,
-			"말 걸지 말아주세요"
-		);
-		//when
-		//then
-		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("DesignerShop not found.");
-	}
-
-	@DisplayName("헤어 예약 생성 시, 과거 날짜/시간이면 예외가 발생한다.")
-	@Test
-	void givenPastDateTime_whenCreateAppointment_thenThrowIllegalStateException() {
-		// given
-		// owner
-		OwnerEntity owner = OwnerFixture.createOwnerEntity();
-		ownerRepository.save(owner);
-
-		// shop
-		ShopEntity shop = ShopFixture.createShopEntity(owner);
-		shopRepository.save(shop);
-
-		// designer
-		DesignerEntity designer = DesignerFixture.createDesignerEntity();
-		designerRepository.save(designer);
-
-		// designerShop
-		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
-		designerShopRepository.save(designerShop);
-
-		// request
-		AppointmentCreateRequest request = new AppointmentCreateRequest(
-			shop.getId(),
-			designerShop.getDesigner().getId(),
-			"커트",
-			ScaleType.DRY,
-			HairType.CURLY,
-			HairLength.MEDIUM,
-			HairTreatmentType.BLEACH,
-			LocalDate.now().minusDays(1),
-			LocalTime.of(12, 0),
-			"말 걸지 말아주세요."
-		);
-
-		// when & then
-		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessage("Appointment date must be after today.");
-	}
-
-	@DisplayName("헤어 예약 생성 시, 동일한 날짜/시간에 이미 예약이 있으면 예외가 발생한다.")
-	@Test
-	void givenDuplicateDateTime_whenCreateAppointment_thenThrowIllegalStateException() {
-		// given
-		// owner
-		OwnerEntity owner = OwnerFixture.createOwnerEntity();
-		ownerRepository.save(owner);
-
-		// shop
-		ShopEntity shop = ShopFixture.createShopEntity(owner);
-		shopRepository.save(shop);
-
-		// designer
-		DesignerEntity designer = DesignerFixture.createDesignerEntity();
-		designerRepository.save(designer);
-
-		// designerShop
-		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
-		designerShopRepository.save(designerShop);
-
-		// client
-		ClientEntity client = ClientFixture.createClient();
-		clientRepository.save(client);
-
-		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
-
-		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
-
-		// appointment
-		AppointmentEntity existedAppointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
-		appointmentRepository.save(existedAppointment);
-
-		// request
-		AppointmentCreateRequest request = new AppointmentCreateRequest(
-			shop.getId(),
-			designerShop.getDesigner().getId(),
-			"커트",
-			ScaleType.DRY,
-			HairType.CURLY,
-			HairLength.MEDIUM,
-			HairTreatmentType.BLEACH,
-			LocalDate.now().plusDays(1),
-			LocalTime.of(12, 0),
-			"말 걸지 말아주세요."
-		);
-
-		// when & then
-		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
-			.isInstanceOf(IllegalStateException.class)
-			.hasMessage("Appointment already exists.");
 	}
 
 	@DisplayName("예약 전체 조회 시 Client 예약을 반환한다.")

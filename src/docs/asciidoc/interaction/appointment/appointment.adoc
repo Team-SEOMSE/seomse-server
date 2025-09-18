@@ -1,19 +1,35 @@
-[[appointment-create]]
-=== 예약 생성
+[[appointment-create-normal]]
+=== 일반 예약 생성
 
 ==== HTTP Request
 
-include::{snippets}/appointment-create/http-request.adoc[]
+include::{snippets}/appointment-create-normal/http-request.adoc[]
 
-==== Request Parts
+==== Request Fields
 
-include::{snippets}/appointment-create/request-parts.adoc[]
-include::{snippets}/appointment-create/request-part-request-fields.adoc[]
+include::{snippets}/appointment-create-normal/request-fields.adoc[]
 
 ==== HTTP Response
 
-include::{snippets}/appointment-create/http-response.adoc[]
-include::{snippets}/appointment-create/response-fields.adoc[]
+include::{snippets}/appointment-create-normal/http-response.adoc[]
+include::{snippets}/appointment-create-normal/response-fields.adoc[]
+
+[[appointment-create-special]]
+=== 섬세 예약 생성
+
+==== HTTP Request
+
+include::{snippets}/appointment-create-special/http-request.adoc[]
+
+==== Request Parts
+
+include::{snippets}/appointment-create-special/request-parts.adoc[]
+include::{snippets}/appointment-create-special/request-part-request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/appointment-create-special/http-response.adoc[]
+include::{snippets}/appointment-create-special/response-fields.adoc[]
 
 [[appointment-get-list]]
 === 예약 조회 전체

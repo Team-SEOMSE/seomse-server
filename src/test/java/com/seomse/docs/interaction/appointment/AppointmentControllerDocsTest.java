@@ -21,12 +21,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 import com.seomse.docs.RestDocsSupport;
 import com.seomse.interaction.appointment.controller.AppointmentController;
-import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.NormalAppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.SpecialAppointmentCreateRequest;
 import com.seomse.interaction.appointment.enums.HairLength;
 import com.seomse.interaction.appointment.enums.HairTreatmentType;
 import com.seomse.interaction.appointment.enums.HairType;
@@ -44,25 +46,70 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		return new AppointmentController(appointmentService);
 	}
 
-	@DisplayName("예약 생성 API")
+	@DisplayName("일반 예약 생성 API")
 	@Test
-	void updateProfile() throws Exception {
+	void createNormalAppointment() throws Exception {
 		// given
 		UUID appointmentId = UUID.randomUUID();
-		given(appointmentService.createAppointment(any(AppointmentCreateRequest.class), any()))
+		given(appointmentService.createNormalAppointment(any(NormalAppointmentCreateRequest.class)))
 			.willReturn(appointmentId);
 
 		// request
-		AppointmentCreateRequest request = new AppointmentCreateRequest(
+		NormalAppointmentCreateRequest request = new NormalAppointmentCreateRequest(
 			UUID.randomUUID(), // shopId
 			UUID.randomUUID(), // designerId
+			LocalDate.now().plusDays(1),
+			LocalTime.of(12, 0),
+			"커트"
+		);
+
+		String requestJson = objectMapper.writeValueAsString(request);
+
+		// when // then
+		mockMvc.perform(
+				post("/interaction/appointments/normal")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(requestJson)
+			)
+			.andExpect(status().isCreated())
+			.andDo(print())
+			.andDo(document("appointment-create-normal",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("shopId").description("샵 UUID"),
+					fieldWithPath("designerId").description("디자이너 UUID"),
+					fieldWithPath("appointmentDate").description("예약 날짜"),
+					fieldWithPath("appointmentTime").description("예약 시간"),
+					fieldWithPath("serviceName").description("시술명")
+				),
+				responseFields(
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data").type(JsonFieldType.STRING).description("생성된 예약 UUID")
+				)
+			));
+	}
+
+	@DisplayName("특별 예약 생성 API")
+	@Test
+	void createSpecialAppointment() throws Exception {
+		// given
+		UUID appointmentId = UUID.randomUUID();
+		given(appointmentService.createSpecialAppointment(any(SpecialAppointmentCreateRequest.class), any()))
+			.willReturn(appointmentId);
+
+		// request
+		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
+			UUID.randomUUID(), // shopId
+			UUID.randomUUID(), // designerId
+			LocalDate.now().plusDays(1),
+			LocalTime.of(12, 0),
 			"커트",
 			ScaleType.NEUTRAL,
 			HairType.CURLY,
 			HairLength.SHORT_CUT,
 			HairTreatmentType.BLEACH,
-			LocalDate.now().plusDays(1),
-			LocalTime.of(12, 0),
 			"requirements"
 		);
 
@@ -81,18 +128,18 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 
 		// when // then
 		mockMvc.perform(
-				multipart("/interaction/appointments")
+				multipart("/interaction/appointments/special")
 					.file(requestPart)
 					.file(imagePart)
 					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
 			)
 			.andExpect(status().isCreated())
 			.andDo(print())
-			.andDo(document("appointment-create",
+			.andDo(document("appointment-create-special",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParts(
-					partWithName("request").description("예약 생성 요청 JSON"),
+					partWithName("request").description("특별 예약 생성 요청 JSON"),
 					partWithName("requirementsImage").description("요구사항 이미지 (optional)").optional()
 				),
 				requestPartFields("request",

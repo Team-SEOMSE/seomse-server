@@ -12,12 +12,19 @@ import com.seomse.interaction.appointment.enums.ScaleType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record AppointmentCreateRequest(
+public record SpecialAppointmentCreateRequest(
+
 	@NotNull(message = "shopId is required.")
 	UUID shopId,
 
 	@NotNull(message = "designerId is required.")
 	UUID designerId,
+
+	@NotNull(message = "appointmentDate is required.")
+	LocalDate appointmentDate,
+
+	@NotNull(message = "appointmentTime is required.")
+	LocalTime appointmentTime,
 
 	@NotBlank(message = "serviceName must not be blank.")
 	String serviceName,
@@ -33,12 +40,6 @@ public record AppointmentCreateRequest(
 
 	@NotNull(message = "hairTreatmentType is required.")
 	HairTreatmentType hairTreatmentType,
-
-	@NotNull(message = "appointmentDate is required.")
-	LocalDate appointmentDate,
-
-	@NotNull(message = "appointmentTime is required.")
-	LocalTime appointmentTime,
 
 	String requirements
 ) {

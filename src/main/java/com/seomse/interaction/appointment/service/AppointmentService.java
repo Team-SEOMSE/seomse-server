@@ -1,7 +1,9 @@
 package com.seomse.interaction.appointment.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,7 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.NormalAppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.SpecialAppointmentCreateRequest;
 import com.seomse.interaction.appointment.entity.AppointmentDetailEntity;
 import com.seomse.interaction.appointment.entity.AppointmentEntity;
 import com.seomse.interaction.appointment.repository.AppointmentDetailRepository;
@@ -41,22 +44,23 @@ public class AppointmentService {
 	private final AppointmentDetailRepository appointmentDetailRepository;
 	private final AppointmentQueryRepository appointmentQueryRepository;
 
-	public UUID createAppointment(AppointmentCreateRequest request,
-		MultipartFile requirementsImage) {
+	private AppointmentEntity createBaseAppointment(UUID requestShopId, UUID requestDesignerId,
+		LocalDate requestDate, LocalTime requestTime, String requestServiceName) {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
 
 		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime appointmentTime = LocalDateTime.of(request.appointmentDate(), request.appointmentTime());
+		LocalDateTime appointmentDateTime = LocalDateTime.of(requestDate, requestTime);
 
-		if (appointmentTime.isBefore(now)) {
+		if (appointmentDateTime.isBefore(now)) {
 			throw new IllegalStateException("Appointment date must be after today.");
 		}
 
-		DesignerShopEntity designerShop = designerShopRepository.findByDesignerId(request.designerId())
+		DesignerShopEntity designerShop = designerShopRepository
+			.findByDesignerIdAndShopId(requestDesignerId, requestShopId)
 			.orElseThrow(() -> new IllegalArgumentException("DesignerShop not found."));
 
 		Boolean exists = appointmentRepository.existsByDesignerShopIdAndAppointmentDateAndAppointmentTime(
-			designerShop.getId(), request.appointmentDate(), request.appointmentTime());
+			designerShop.getId(), requestDate, requestTime);
 
 		if (exists) {
 			throw new IllegalStateException("Appointment already exists.");
@@ -66,9 +70,22 @@ public class AppointmentService {
 			.orElseThrow(() -> new IllegalArgumentException("User not found."));
 
 		AppointmentEntity appointment = new AppointmentEntity(client, designerShop,
-			request.appointmentDate(), request.appointmentTime(), request.serviceName());
+			requestDate, requestTime, requestServiceName);
 
 		appointmentRepository.save(appointment);
+
+		return appointment;
+	}
+
+	public UUID createNormalAppointment(NormalAppointmentCreateRequest request) {
+		return createBaseAppointment(request.shopId(), request.designerId(),
+			request.appointmentDate(), request.appointmentTime(), request.serviceName()).getId();
+	}
+
+	public UUID createSpecialAppointment(SpecialAppointmentCreateRequest request,
+		MultipartFile requirementsImage) {
+		AppointmentEntity appointment = createBaseAppointment(request.shopId(), request.designerId(),
+			request.appointmentDate(), request.appointmentTime(), request.serviceName());
 
 		String s3Key = null;
 		if (requirementsImage != null && !requirementsImage.isEmpty()) {
