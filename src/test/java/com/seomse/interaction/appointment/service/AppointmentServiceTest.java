@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -118,6 +120,9 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		// request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
 			shop.getId(),
 			designerShop.getDesigner().getId(),
@@ -126,6 +131,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			HairType.CURLY,
 			HairLength.MEDIUM,
 			HairTreatmentType.BLEACH,
+			testDate,
+			testTime,
 			"말 걸지 말아주세요."
 		);
 
@@ -135,6 +142,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		// then
 		// appointment
 		AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow();
+		assertThat(appointment.getAppointmentDate()).isEqualTo(testDate);
+		assertThat(appointment.getAppointmentTime()).isEqualTo(testTime);
 		assertThat(appointment.getServiceName()).isEqualTo("커트");
 		assertThat(appointment.getClient().getId()).isEqualTo(client.getId());
 		assertThat(appointment.getDesignerShop().getId()).isEqualTo(designerShop.getId());
@@ -179,6 +188,9 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		// request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
 			shop.getId(),
 			designerShop.getDesigner().getId(),
@@ -187,6 +199,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			HairType.CURLY,
 			HairLength.MEDIUM,
 			HairTreatmentType.BLEACH,
+			testDate,
+			testTime,
 			"말 걸지 말아주세요."
 		);
 
@@ -211,6 +225,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		// then
 		// appointment
 		AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow();
+		assertThat(appointment.getAppointmentDate()).isEqualTo(testDate);
+		assertThat(appointment.getAppointmentTime()).isEqualTo(testTime);
 		assertThat(appointment.getServiceName()).isEqualTo("커트");
 		assertThat(appointment.getClient().getId()).isEqualTo(client.getId());
 		assertThat(appointment.getDesignerShop().getId()).isEqualTo(designerShop.getId());
@@ -256,9 +272,13 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		// client
 		UUID nonExistClientId = UUID.randomUUID();
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(nonExistClientId, Role.CLIENT);
+
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		//request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
 			shop.getId(),
 			designerShop.getDesigner().getId(),
@@ -267,6 +287,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			HairType.CURLY,
 			HairLength.MEDIUM,
 			HairTreatmentType.BLEACH,
+			testDate,
+			testTime,
 			"말 걸지 말아주세요"
 		);
 		//when
@@ -301,6 +323,9 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		//request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
 		AppointmentCreateRequest request = new AppointmentCreateRequest(
 			shop.getId(),
 			designer.getId(),
@@ -309,6 +334,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			HairType.CURLY,
 			HairLength.MEDIUM,
 			HairTreatmentType.BLEACH,
+			testDate,
+			testTime,
 			"말 걸지 말아주세요"
 		);
 		//when
@@ -316,6 +343,98 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("DesignerShop not found.");
+	}
+
+	@DisplayName("헤어 예약 생성 시, 과거 날짜/시간이면 예외가 발생한다.")
+	@Test
+	void givenPastDateTime_whenCreateAppointment_thenThrowIllegalStateException() {
+		// given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// request
+		AppointmentCreateRequest request = new AppointmentCreateRequest(
+			shop.getId(),
+			designerShop.getDesigner().getId(),
+			"커트",
+			ScaleType.DRY,
+			HairType.CURLY,
+			HairLength.MEDIUM,
+			HairTreatmentType.BLEACH,
+			LocalDate.now().minusDays(1),
+			LocalTime.of(12, 0),
+			"말 걸지 말아주세요."
+		);
+
+		// when & then
+		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("Appointment date must be after today.");
+	}
+
+	@DisplayName("헤어 예약 생성 시, 동일한 날짜/시간에 이미 예약이 있으면 예외가 발생한다.")
+	@Test
+	void givenDuplicateDateTime_whenCreateAppointment_thenThrowIllegalStateException() {
+		// given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		// appointment
+		AppointmentEntity existedAppointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		appointmentRepository.save(existedAppointment);
+
+		// request
+		AppointmentCreateRequest request = new AppointmentCreateRequest(
+			shop.getId(),
+			designerShop.getDesigner().getId(),
+			"커트",
+			ScaleType.DRY,
+			HairType.CURLY,
+			HairLength.MEDIUM,
+			HairTreatmentType.BLEACH,
+			LocalDate.now().plusDays(1),
+			LocalTime.of(12, 0),
+			"말 걸지 말아주세요."
+		);
+
+		// when & then
+		assertThatThrownBy(() -> appointmentService.createAppointment(request, null))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("Appointment already exists.");
 	}
 
 	@DisplayName("예약 전체 조회 시 Client 예약을 반환한다.")

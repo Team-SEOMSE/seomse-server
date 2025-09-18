@@ -1,6 +1,7 @@
 package com.seomse.interaction.appointment.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,13 +45,28 @@ public class AppointmentService {
 		MultipartFile requirementsImage) {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
 
-		ClientEntity client = clientRepository.findById(loginUser.userId())
-			.orElseThrow(() -> new IllegalArgumentException("User not found."));
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime appointmentTime = LocalDateTime.of(request.appointmentDate(), request.appointmentTime());
+
+		if (appointmentTime.isBefore(now)) {
+			throw new IllegalStateException("Appointment date must be after today.");
+		}
 
 		DesignerShopEntity designerShop = designerShopRepository.findByDesignerId(request.designerId())
 			.orElseThrow(() -> new IllegalArgumentException("DesignerShop not found."));
 
-		AppointmentEntity appointment = new AppointmentEntity(client, designerShop, request.serviceName());
+		Boolean exists = appointmentRepository.existsByDesignerShopIdAndAppointmentDateAndAppointmentTime(
+			designerShop.getId(), request.appointmentDate(), request.appointmentTime());
+
+		if (exists) {
+			throw new IllegalStateException("Appointment already exists.");
+		}
+
+		ClientEntity client = clientRepository.findById(loginUser.userId())
+			.orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+		AppointmentEntity appointment = new AppointmentEntity(client, designerShop,
+			request.appointmentDate(), request.appointmentTime(), request.serviceName());
 
 		appointmentRepository.save(appointment);
 
@@ -72,6 +88,7 @@ public class AppointmentService {
 		return appointment.getId();
 	}
 
+	@Transactional(readOnly = true)
 	public List<AppointmentListResponse> getAppointmentList() {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
 		Role role = loginUser.role();
@@ -91,11 +108,13 @@ public class AppointmentService {
 		}
 	}
 
+	@Transactional(readOnly = true)
 	public AppointmentDetailResponse getAppointment(UUID appointmentId) {
 		return appointmentQueryRepository.findAppointmentDetail(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
 	}
 
+	@Transactional(readOnly = true)
 	public AppointmentDetailResponse getAppointmentByLatest() {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
 		return appointmentQueryRepository.findAppointmentDetailByLatest(loginUser.userId())

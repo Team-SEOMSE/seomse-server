@@ -10,7 +10,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -59,6 +61,8 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 			HairType.CURLY,
 			HairLength.SHORT_CUT,
 			HairTreatmentType.BLEACH,
+			LocalDate.now().plusDays(1),
+			LocalTime.of(12, 0),
 			"requirements"
 		);
 
@@ -94,6 +98,8 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 				requestPartFields("request",
 					fieldWithPath("shopId").description("샵 UUID"),
 					fieldWithPath("designerId").description("디자이너 UUID"),
+					fieldWithPath("appointmentDate").description("예약 날짜"),
+					fieldWithPath("appointmentTime").description("예약 시간"),
 					fieldWithPath("serviceName").description("시술명"),
 					fieldWithPath("scaleType").description("두피 타입. 가능한 값: " + Arrays.toString(ScaleType.values())),
 					fieldWithPath("hairType").description("모발 타입. 가능한 값: " + Arrays.toString(HairType.values())),
