@@ -92,6 +92,164 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		clientRepository.deleteAll();
 	}
 
+	@DisplayName("special 헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 없음)")
+	@Test
+	void givenValidRequestWithoutImage_whenCreateAppointment_thenReturnAppointmentId() {
+		// given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		// request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
+		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
+			shop.getId(),
+			designerShop.getDesigner().getId(),
+			testDate,
+			testTime,
+			"커트",
+			ScaleType.DRY,
+			HairType.CURLY,
+			HairLength.MEDIUM,
+			HairTreatmentType.BLEACH,
+			"말 걸지 말아주세요."
+		);
+
+		// when
+		UUID appointmentId = appointmentService.createSpecialAppointment(request, null);
+
+		// then
+		// appointment
+		AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow();
+		assertThat(appointment.getAppointmentDate()).isEqualTo(testDate);
+		assertThat(appointment.getAppointmentTime()).isEqualTo(testTime);
+		assertThat(appointment.getServiceName()).isEqualTo("커트");
+		assertThat(appointment.getClient().getId()).isEqualTo(client.getId());
+		assertThat(appointment.getDesignerShop().getId()).isEqualTo(designerShop.getId());
+
+		// appointmentDetail
+		AppointmentDetailEntity appointmentDetail = appointmentDetailRepository.findByAppointmentId(appointmentId)
+			.orElseThrow();
+		assertThat(appointmentDetail.getRequirements()).isEqualTo("말 걸지 말아주세요.");
+		assertThat(appointmentDetail.getScaleType()).isEqualTo(ScaleType.DRY);
+		assertThat(appointmentDetail.getHairType()).isEqualTo(HairType.CURLY);
+		assertThat(appointmentDetail.getHairLength()).isEqualTo(HairLength.MEDIUM);
+		assertThat(appointmentDetail.getHairTreatmentType()).isEqualTo(HairTreatmentType.BLEACH);
+		assertThat(appointmentDetail.getRequirementsImage()).isNull();
+	}
+
+	@DisplayName("special 헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 있음)")
+	@Test
+	void givenValidRequestWithImage_whenCreateAppointment_thenReturnAppointmentId() throws IOException {
+		// given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		// request
+		LocalDate testDate = LocalDate.now().plusDays(1);
+		LocalTime testTime = LocalTime.of(12, 0);
+
+		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
+			shop.getId(),
+			designerShop.getDesigner().getId(),
+			testDate,
+			testTime,
+			"커트",
+			ScaleType.DRY,
+			HairType.CURLY,
+			HairLength.MEDIUM,
+			HairTreatmentType.BLEACH,
+			"말 걸지 말아주세요."
+		);
+
+		// S3Client
+		given(s3Client.putObject(
+			any(Consumer.class),
+			any(RequestBody.class)
+		)).willReturn(PutObjectResponse.builder().build());
+
+		// requirementsImage
+		MockMultipartFile fakeRequirementsImage = new MockMultipartFile(
+			"requirementsImage",
+			"test.png",
+			"image/png",
+			"fake image".getBytes()
+		);
+
+		// when
+		// appointment
+		UUID appointmentId = appointmentService.createSpecialAppointment(request, fakeRequirementsImage);
+
+		// then
+		// appointment
+		AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow();
+		assertThat(appointment.getAppointmentDate()).isEqualTo(testDate);
+		assertThat(appointment.getAppointmentTime()).isEqualTo(testTime);
+		assertThat(appointment.getServiceName()).isEqualTo("커트");
+		assertThat(appointment.getClient().getId()).isEqualTo(client.getId());
+		assertThat(appointment.getDesignerShop().getId()).isEqualTo(designerShop.getId());
+
+		// appointmentDetail
+		AppointmentDetailEntity appointmentDetail = appointmentDetailRepository.findByAppointmentId(appointmentId)
+			.orElseThrow();
+		assertThat(appointmentDetail.getRequirements()).isEqualTo("말 걸지 말아주세요.");
+		assertThat(appointmentDetail.getScaleType()).isEqualTo(ScaleType.DRY);
+		assertThat(appointmentDetail.getHairType()).isEqualTo(HairType.CURLY);
+		assertThat(appointmentDetail.getHairLength()).isEqualTo(HairLength.MEDIUM);
+		assertThat(appointmentDetail.getHairTreatmentType()).isEqualTo(HairTreatmentType.BLEACH);
+
+		// s3key
+		assertThat(appointmentDetail.getRequirementsImage()).isNotNull();
+		assertThat(appointmentDetail.getRequirementsImage()).endsWith(".png");
+		verify(s3Client, times(1)).putObject(
+			any(Consumer.class),
+			any(RequestBody.class)
+		);
+	}
+
 	@DisplayName("normal 헤어 예약 생성 시, 존재하지 않는 Client ID로 예약을 생성하면 예외가 발생한다.")
 	@Test
 	void givenInvalidClientId_whenCreateNormalAppointment_thenThrowUserNotFoundException() {
@@ -264,164 +422,6 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThatThrownBy(() -> appointmentService.createNormalAppointment(request))
 			.isInstanceOf(IllegalStateException.class)
 			.hasMessage("Appointment already exists.");
-	}
-
-	@DisplayName("special 헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 없음)")
-	@Test
-	void givenValidRequestWithoutImage_whenCreateAppointment_thenReturnAppointmentId() {
-		// given
-		// owner
-		OwnerEntity owner = OwnerFixture.createOwnerEntity();
-		ownerRepository.save(owner);
-
-		// shop
-		ShopEntity shop = ShopFixture.createShopEntity(owner);
-		shopRepository.save(shop);
-
-		// designer
-		DesignerEntity designer = DesignerFixture.createDesignerEntity();
-		designerRepository.save(designer);
-
-		// designerShop
-		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
-		designerShopRepository.save(designerShop);
-
-		// client
-		ClientEntity client = ClientFixture.createClient();
-		clientRepository.save(client);
-
-		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
-
-		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
-
-		// request
-		LocalDate testDate = LocalDate.now().plusDays(1);
-		LocalTime testTime = LocalTime.of(12, 0);
-
-		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
-			shop.getId(),
-			designerShop.getDesigner().getId(),
-			testDate,
-			testTime,
-			"커트",
-			ScaleType.DRY,
-			HairType.CURLY,
-			HairLength.MEDIUM,
-			HairTreatmentType.BLEACH,
-			"말 걸지 말아주세요."
-		);
-
-		// when
-		UUID appointmentId = appointmentService.createSpecialAppointment(request, null);
-
-		// then
-		// appointment
-		AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow();
-		assertThat(appointment.getAppointmentDate()).isEqualTo(testDate);
-		assertThat(appointment.getAppointmentTime()).isEqualTo(testTime);
-		assertThat(appointment.getServiceName()).isEqualTo("커트");
-		assertThat(appointment.getClient().getId()).isEqualTo(client.getId());
-		assertThat(appointment.getDesignerShop().getId()).isEqualTo(designerShop.getId());
-
-		// appointmentDetail
-		AppointmentDetailEntity appointmentDetail = appointmentDetailRepository.findByAppointmentId(appointmentId)
-			.orElseThrow();
-		assertThat(appointmentDetail.getRequirements()).isEqualTo("말 걸지 말아주세요.");
-		assertThat(appointmentDetail.getScaleType()).isEqualTo(ScaleType.DRY);
-		assertThat(appointmentDetail.getHairType()).isEqualTo(HairType.CURLY);
-		assertThat(appointmentDetail.getHairLength()).isEqualTo(HairLength.MEDIUM);
-		assertThat(appointmentDetail.getHairTreatmentType()).isEqualTo(HairTreatmentType.BLEACH);
-		assertThat(appointmentDetail.getRequirementsImage()).isNull();
-	}
-
-	@DisplayName("special 헤어 예약 생성 시, appointmentId를 반환한다. (Client, DesignerShop 있음 + 이미지 있음)")
-	@Test
-	void givenValidRequestWithImage_whenCreateAppointment_thenReturnAppointmentId() throws IOException {
-		// given
-		// owner
-		OwnerEntity owner = OwnerFixture.createOwnerEntity();
-		ownerRepository.save(owner);
-
-		// shop
-		ShopEntity shop = ShopFixture.createShopEntity(owner);
-		shopRepository.save(shop);
-
-		// designer
-		DesignerEntity designer = DesignerFixture.createDesignerEntity();
-		designerRepository.save(designer);
-
-		// designerShop
-		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
-		designerShopRepository.save(designerShop);
-
-		// client
-		ClientEntity client = ClientFixture.createClient();
-		clientRepository.save(client);
-
-		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
-
-		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
-
-		// request
-		LocalDate testDate = LocalDate.now().plusDays(1);
-		LocalTime testTime = LocalTime.of(12, 0);
-
-		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
-			shop.getId(),
-			designerShop.getDesigner().getId(),
-			testDate,
-			testTime,
-			"커트",
-			ScaleType.DRY,
-			HairType.CURLY,
-			HairLength.MEDIUM,
-			HairTreatmentType.BLEACH,
-			"말 걸지 말아주세요."
-		);
-
-		// S3Client
-		given(s3Client.putObject(
-			any(Consumer.class),
-			any(RequestBody.class)
-		)).willReturn(PutObjectResponse.builder().build());
-
-		// requirementsImage
-		MockMultipartFile fakeRequirementsImage = new MockMultipartFile(
-			"requirementsImage",
-			"test.png",
-			"image/png",
-			"fake image".getBytes()
-		);
-
-		// when
-		// appointment
-		UUID appointmentId = appointmentService.createSpecialAppointment(request, fakeRequirementsImage);
-
-		// then
-		// appointment
-		AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow();
-		assertThat(appointment.getAppointmentDate()).isEqualTo(testDate);
-		assertThat(appointment.getAppointmentTime()).isEqualTo(testTime);
-		assertThat(appointment.getServiceName()).isEqualTo("커트");
-		assertThat(appointment.getClient().getId()).isEqualTo(client.getId());
-		assertThat(appointment.getDesignerShop().getId()).isEqualTo(designerShop.getId());
-
-		// appointmentDetail
-		AppointmentDetailEntity appointmentDetail = appointmentDetailRepository.findByAppointmentId(appointmentId)
-			.orElseThrow();
-		assertThat(appointmentDetail.getRequirements()).isEqualTo("말 걸지 말아주세요.");
-		assertThat(appointmentDetail.getScaleType()).isEqualTo(ScaleType.DRY);
-		assertThat(appointmentDetail.getHairType()).isEqualTo(HairType.CURLY);
-		assertThat(appointmentDetail.getHairLength()).isEqualTo(HairLength.MEDIUM);
-		assertThat(appointmentDetail.getHairTreatmentType()).isEqualTo(HairTreatmentType.BLEACH);
-
-		// s3key
-		assertThat(appointmentDetail.getRequirementsImage()).isNotNull();
-		assertThat(appointmentDetail.getRequirementsImage()).endsWith(".png");
-		verify(s3Client, times(1)).putObject(
-			any(Consumer.class),
-			any(RequestBody.class)
-		);
 	}
 
 	@DisplayName("예약 전체 조회 시 Client 예약을 반환한다.")
