@@ -44,6 +44,34 @@ public class AppointmentService {
 	private final AppointmentDetailRepository appointmentDetailRepository;
 	private final AppointmentQueryRepository appointmentQueryRepository;
 
+	public UUID createNormalAppointment(NormalAppointmentCreateRequest request) {
+		return createBaseAppointment(request.shopId(), request.designerId(),
+			request.appointmentDate(), request.appointmentTime(), request.serviceName()).getId();
+	}
+
+	public UUID createSpecialAppointment(SpecialAppointmentCreateRequest request,
+		MultipartFile requirementsImage) {
+		AppointmentEntity appointment = createBaseAppointment(request.shopId(), request.designerId(),
+			request.appointmentDate(), request.appointmentTime(), request.serviceName());
+
+		String s3Key = null;
+		if (requirementsImage != null && !requirementsImage.isEmpty()) {
+			final String S3_FOLDER = "appointment";
+			try {
+				s3Key = s3Service.upload(requirementsImage, S3_FOLDER);
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to upload requirements image.", e);
+			}
+		}
+
+		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, request.scaleType(),
+			request.hairType(), request.hairLength(), request.hairTreatmentType(), request.requirements(), s3Key);
+
+		appointmentDetailRepository.save(appointmentDetail);
+
+		return appointment.getId();
+	}
+
 	private AppointmentEntity createBaseAppointment(UUID requestShopId, UUID requestDesignerId,
 		LocalDate requestDate, LocalTime requestTime, String requestServiceName) {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
@@ -75,34 +103,6 @@ public class AppointmentService {
 		appointmentRepository.save(appointment);
 
 		return appointment;
-	}
-
-	public UUID createNormalAppointment(NormalAppointmentCreateRequest request) {
-		return createBaseAppointment(request.shopId(), request.designerId(),
-			request.appointmentDate(), request.appointmentTime(), request.serviceName()).getId();
-	}
-
-	public UUID createSpecialAppointment(SpecialAppointmentCreateRequest request,
-		MultipartFile requirementsImage) {
-		AppointmentEntity appointment = createBaseAppointment(request.shopId(), request.designerId(),
-			request.appointmentDate(), request.appointmentTime(), request.serviceName());
-
-		String s3Key = null;
-		if (requirementsImage != null && !requirementsImage.isEmpty()) {
-			final String S3_FOLDER = "appointment";
-			try {
-				s3Key = s3Service.upload(requirementsImage, S3_FOLDER);
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to upload requirements image.", e);
-			}
-		}
-
-		AppointmentDetailEntity appointmentDetail = new AppointmentDetailEntity(appointment, request.scaleType(),
-			request.hairType(), request.hairLength(), request.hairTreatmentType(), request.requirements(), s3Key);
-
-		appointmentDetailRepository.save(appointmentDetail);
-
-		return appointment.getId();
 	}
 
 	@Transactional(readOnly = true)
