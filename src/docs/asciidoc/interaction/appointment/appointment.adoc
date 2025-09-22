@@ -4,9 +4,6 @@
 ==== HTTP Request
 
 include::{snippets}/appointment-create-normal/http-request.adoc[]
-
-==== Request Fields
-
 include::{snippets}/appointment-create-normal/request-fields.adoc[]
 
 ==== HTTP Response
