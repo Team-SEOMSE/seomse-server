@@ -1,5 +1,7 @@
 package com.seomse.interaction.appointment.entity;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -41,12 +43,21 @@ public class AppointmentEntity extends BaseTimeEntity {
 	@JoinColumn(name = "designer_shop_id", nullable = false)
 	private DesignerShopEntity designerShop;
 
+	@Column(nullable = false)
+	private LocalDate appointmentDate;
+
+	@Column(nullable = false)
+	private LocalTime appointmentTime;
+
 	@Column(length = 190, nullable = false)
 	private String serviceName;
 
-	public AppointmentEntity(ClientEntity client, DesignerShopEntity designerShop, String serviceName) {
+	public AppointmentEntity(ClientEntity client, DesignerShopEntity designerShop,
+		LocalDate appointmentDate, LocalTime appointmentTime, String serviceName) {
 		this.client = client;
 		this.designerShop = designerShop;
+		this.appointmentDate = appointmentDate;
+		this.appointmentTime = appointmentTime;
 		this.serviceName = serviceName;
 	}
 }

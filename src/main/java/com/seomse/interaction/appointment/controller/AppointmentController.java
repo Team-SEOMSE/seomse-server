@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.seomse.common.controller.ApiResponse;
-import com.seomse.interaction.appointment.controller.request.AppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.NormalAppointmentCreateRequest;
+import com.seomse.interaction.appointment.controller.request.SpecialAppointmentCreateRequest;
 import com.seomse.interaction.appointment.service.AppointmentService;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
@@ -29,12 +31,18 @@ public class AppointmentController {
 
 	private final AppointmentService appointmentService;
 
-	@PostMapping
+	@PostMapping("/normal")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResponse<UUID> createAppointment(
-		@Valid @RequestPart AppointmentCreateRequest request,
+	public ApiResponse<UUID> createNormalAppointment(@Valid @RequestBody NormalAppointmentCreateRequest request) {
+		return ApiResponse.created(appointmentService.createNormalAppointment(request));
+	}
+
+	@PostMapping("/special")
+	@ResponseStatus(HttpStatus.CREATED)
+	public ApiResponse<UUID> createSpecialAppointment(
+		@Valid @RequestPart SpecialAppointmentCreateRequest request,
 		@RequestPart(required = false) MultipartFile requirementsImage) {
-		return ApiResponse.created(appointmentService.createAppointment(request, requirementsImage));
+		return ApiResponse.created(appointmentService.createSpecialAppointment(request, requirementsImage));
 	}
 
 	@GetMapping

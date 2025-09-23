@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.seomse.shop.entity.DesignerShopEntity;
 
 public interface DesignerShopRepository extends JpaRepository<DesignerShopEntity, UUID> {
-	Optional<DesignerShopEntity> findByDesignerId(UUID designerId);
+	Optional<DesignerShopEntity> findByDesignerIdAndShopId(UUID designerId, UUID shopId);
 }
