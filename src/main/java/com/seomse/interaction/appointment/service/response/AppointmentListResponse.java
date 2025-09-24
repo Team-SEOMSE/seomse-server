@@ -1,6 +1,7 @@
 package com.seomse.interaction.appointment.service.response;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 public record AppointmentListResponse(
@@ -8,6 +9,7 @@ public record AppointmentListResponse(
 	String shopName,
 	String designerNickname,
 	String serviceName,
-	LocalDateTime appointmentDate
+	LocalDate appointmentDate,
+	LocalTime appointmentTime
 ) {
 }

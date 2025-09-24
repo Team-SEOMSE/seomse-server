@@ -464,7 +464,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
 		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
-		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
+		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
+		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
 	}
 
 	@DisplayName("예약 전체 조회 시 Owner 예약을 반환한다.")
@@ -508,7 +509,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
 		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
-		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
+		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
+		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
 	}
 
 	@DisplayName("예약 전체 조회 시 Designer 예약을 반환한다.")
@@ -552,7 +554,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
 		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
-		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
+		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
+		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
 	}
 
 	@DisplayName("예약 상세 조회에 성공하면 AppointmentDetailResponse를 반환한다.")

@@ -31,7 +31,8 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate
+				appointmentEntity.appointmentDate,
+				appointmentEntity.appointmentTime
 			))
 			.from(appointmentEntity)
 			.join(appointmentEntity.designerShop, designerShopEntity)
@@ -48,7 +49,8 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate
+				appointmentEntity.appointmentDate,
+				appointmentEntity.appointmentTime
 			))
 			.from(appointmentEntity)
 			.join(appointmentEntity.designerShop, designerShopEntity)
@@ -65,7 +67,8 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate
+				appointmentEntity.appointmentDate,
+				appointmentEntity.appointmentTime
 			))
 			.from(appointmentEntity)
 			.join(appointmentEntity.designerShop, designerShopEntity)
