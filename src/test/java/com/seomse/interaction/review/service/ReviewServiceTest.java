@@ -239,7 +239,56 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		// then
 		assertThatThrownBy(() -> reviewService.createReview(request, null))
 			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("Appointment not found");
+			.hasMessage("Appointment not found.");
+	}
+
+	@DisplayName("리뷰 생성 시, appointmentId에 이미 리뷰가 존재하면 예외가 발생한다.")
+	@Test
+	void givenExistingReviewForAppointment_whenCreateReview_thenThrowException() {
+		//given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// designerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
+
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		// appointment
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		appointmentRepository.save(appointment);
+
+		// review
+		ReviewEntity review = ReviewFixture.createReviewEntity(appointment);
+		reviewRepository.save(review);
+
+		// request
+		String reviewRating = "5";
+		String reviewContent = "reviewContent";
+
+		ReviewCreateRequest request = new ReviewCreateRequest(appointment.getId(), reviewRating, reviewContent);
+
+		// when
+		// then
+		assertThatThrownBy(() -> reviewService.createReview(request, null))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("Review already exists for this appointment.");
 	}
 
 	@DisplayName("Role이 OWNER일 경우, ownerId 기준으로 리뷰 목록을 반환한다.")

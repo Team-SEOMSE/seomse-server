@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.seomse.interaction.review.entity.ReviewEntity;
 
 public interface ReviewRepository extends JpaRepository<ReviewEntity, UUID> {
+	boolean existsByAppointmentId(UUID appointmentId);
 }

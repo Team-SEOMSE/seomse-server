@@ -8,6 +8,7 @@ public record AppointmentListResponse(
 	String shopName,
 	String designerNickname,
 	String serviceName,
-	LocalDateTime appointmentDate
+	LocalDateTime appointmentDate,
+	boolean hasReview
 ) {
 }

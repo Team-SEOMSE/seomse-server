@@ -168,10 +168,10 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		// given
 		List<AppointmentListResponse> response = List.of(new AppointmentListResponse(
 				UUID.randomUUID(), "shopName1", "designerNickName1",
-				"serviceName1", LocalDateTime.of(2025, 12, 25, 12, 0)),
+				"serviceName1", LocalDateTime.of(2025, 12, 25, 12, 0), false),
 			new AppointmentListResponse(
 				UUID.randomUUID(), "shopName2", "designerNickName1",
-				"serviceName2", LocalDateTime.of(2025, 12, 25, 13, 0))
+				"serviceName2", LocalDateTime.of(2025, 12, 25, 13, 0), false)
 		);
 		given(appointmentService.getAppointmentList()).willReturn(response);
 
@@ -192,7 +192,9 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("data[].designerNickname").type(JsonFieldType.STRING).description("디자이너 닉네임"),
 					fieldWithPath("data[].serviceName").type(JsonFieldType.STRING).description("시술명"),
 					fieldWithPath("data[].appointmentDate").type(JsonFieldType.STRING)
-						.description("예약 일시 (yyyy-MM-dd HH:mm:ss)")
+						.description("예약 일시 (yyyy-MM-dd HH:mm:ss)"),
+					fieldWithPath("data[].hasReview").type(JsonFieldType.BOOLEAN)
+						.description("리뷰 존재 여부")
 				)
 			));
 	}
