@@ -2,6 +2,7 @@ package com.seomse.interaction.appointment.repository;
 
 import static com.seomse.interaction.appointment.entity.QAppointmentDetailEntity.*;
 import static com.seomse.interaction.appointment.entity.QAppointmentEntity.*;
+import static com.seomse.interaction.review.entity.QReviewEntity.*;
 import static com.seomse.shop.entity.QDesignerShopEntity.*;
 import static com.seomse.shop.entity.QShopEntity.*;
 import static com.seomse.user.designer.entity.QDesignerEntity.*;
@@ -31,12 +32,14 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate
+				appointmentEntity.createdDate,
+				reviewEntity.id.isNotNull()
 			))
 			.from(appointmentEntity)
 			.join(appointmentEntity.designerShop, designerShopEntity)
 			.join(designerShopEntity.shop, shopEntity)
 			.join(designerShopEntity.designer, designerEntity)
+			.leftJoin(reviewEntity).on(reviewEntity.appointment.eq(appointmentEntity))
 			.where(appointmentEntity.client.id.eq(clientId))
 			.fetch();
 	}
@@ -48,12 +51,14 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate
+				appointmentEntity.createdDate,
+				reviewEntity.id.isNotNull()
 			))
 			.from(appointmentEntity)
 			.join(appointmentEntity.designerShop, designerShopEntity)
 			.join(designerShopEntity.shop, shopEntity)
 			.join(designerShopEntity.designer, designerEntity)
+			.leftJoin(reviewEntity).on(reviewEntity.appointment.eq(appointmentEntity))
 			.where(shopEntity.owner.id.eq(ownerId))
 			.fetch();
 	}
@@ -65,12 +70,14 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate
+				appointmentEntity.createdDate,
+				reviewEntity.id.isNotNull()
 			))
 			.from(appointmentEntity)
 			.join(appointmentEntity.designerShop, designerShopEntity)
 			.join(designerShopEntity.shop, shopEntity)
 			.join(designerShopEntity.designer, designerEntity)
+			.leftJoin(reviewEntity).on(reviewEntity.appointment.eq(appointmentEntity))
 			.where(designerShopEntity.designer.id.eq(designerId))
 			.fetch();
 	}
