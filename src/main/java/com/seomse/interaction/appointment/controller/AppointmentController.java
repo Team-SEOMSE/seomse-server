@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.seomse.common.controller.ApiResponse;
+import com.seomse.interaction.appointment.controller.request.AppointmentDateRequest;
 import com.seomse.interaction.appointment.controller.request.NormalAppointmentCreateRequest;
 import com.seomse.interaction.appointment.controller.request.SpecialAppointmentCreateRequest;
 import com.seomse.interaction.appointment.service.AppointmentService;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
+import com.seomse.interaction.appointment.service.response.AppointmentTimeListResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +60,11 @@ public class AppointmentController {
 	@GetMapping("/details")
 	public ApiResponse<AppointmentDetailResponse> getAppointmentByLatest() {
 		return ApiResponse.ok(appointmentService.getAppointmentByLatest());
+	}
+
+	@GetMapping("/times")
+	public ApiResponse<List<AppointmentTimeListResponse>> getAppointmentByDesignerAndDateTime(
+		@Valid @RequestBody AppointmentDateRequest request) {
+		return ApiResponse.ok(appointmentService.getAppointmentByDesignerAndDateTime(request));
 	}
 }

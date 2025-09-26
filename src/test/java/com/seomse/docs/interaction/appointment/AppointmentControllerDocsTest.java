@@ -1,7 +1,6 @@
 package com.seomse.docs.interaction.appointment;
 
 import static org.mockito.BDDMockito.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -10,9 +9,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +28,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 
 import com.seomse.docs.RestDocsSupport;
 import com.seomse.interaction.appointment.controller.AppointmentController;
+import com.seomse.interaction.appointment.controller.request.AppointmentDateRequest;
 import com.seomse.interaction.appointment.controller.request.NormalAppointmentCreateRequest;
 import com.seomse.interaction.appointment.controller.request.SpecialAppointmentCreateRequest;
 import com.seomse.interaction.appointment.enums.HairLength;
@@ -36,8 +38,16 @@ import com.seomse.interaction.appointment.enums.ScaleType;
 import com.seomse.interaction.appointment.service.AppointmentService;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
+import com.seomse.interaction.appointment.service.response.AppointmentTimeListResponse;
 
 public class AppointmentControllerDocsTest extends RestDocsSupport {
+
+	private final Clock clock = Clock.fixed(
+		LocalDateTime.of(2025, 9, 17, 12, 0)
+			.atZone(ZoneId.systemDefault())
+			.toInstant(),
+		ZoneId.systemDefault()
+	);
 
 	private final AppointmentService appointmentService = Mockito.mock(AppointmentService.class);
 
@@ -58,7 +68,7 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		NormalAppointmentCreateRequest request = new NormalAppointmentCreateRequest(
 			UUID.randomUUID(), // shopId
 			UUID.randomUUID(), // designerId
-			LocalDate.now().plusDays(1),
+			LocalDate.now(clock).plusDays(1),
 			LocalTime.of(12, 0),
 			"커트"
 		);
@@ -103,7 +113,7 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		SpecialAppointmentCreateRequest request = new SpecialAppointmentCreateRequest(
 			UUID.randomUUID(), // shopId
 			UUID.randomUUID(), // designerId
-			LocalDate.now().plusDays(1),
+			LocalDate.now(clock).plusDays(1),
 			LocalTime.of(12, 0),
 			"커트",
 			ScaleType.NEUTRAL,
@@ -262,9 +272,6 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 			.andDo(document("appointment-get-detail-latest",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				requestHeaders(
-					headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer <JWT ACCESS TOKEN>")
-				),
 				responseFields(
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
 					fieldWithPath("data.scaleType").description("두피 타입"),
@@ -273,6 +280,47 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("data.hairTreatmentType").description("모발 시술 이력"),
 					fieldWithPath("data.requirements").type(JsonFieldType.STRING).description("고객 요청사항"),
 					fieldWithPath("data.requirementsImage").type(JsonFieldType.STRING).description("요청사항 이미지")
+				)
+			));
+	}
+
+	@DisplayName("예약 시간 조회 API")
+	@Test
+	void getAppointmentByDesignerAndDateTime() throws Exception {
+		// given
+		List<AppointmentTimeListResponse> response = List.of(new AppointmentTimeListResponse(
+			LocalTime.of(12, 0)
+		));
+
+		given(appointmentService.getAppointmentByDesignerAndDateTime(any(AppointmentDateRequest.class))).willReturn(
+			response);
+
+		// request
+		AppointmentDateRequest request = new AppointmentDateRequest(UUID.randomUUID(), UUID.randomUUID(),
+			LocalDate.of(2025, 9, 17));
+
+		String requestJson = objectMapper.writeValueAsString(request);
+
+		// when // then
+		mockMvc.perform(
+				get("/interaction/appointments/times")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(requestJson)
+			)
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("appointment-get-times",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("shopId").type(JsonFieldType.STRING).description("샵 UUID"),
+					fieldWithPath("designerId").type(JsonFieldType.STRING).description("디자이너 UUID"),
+					fieldWithPath("appointmentDate").type(JsonFieldType.STRING).description("예약 선택 날짜 (yyyy-MM-dd)")
+				),
+				responseFields(
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data[].appointmentTime").type(JsonFieldType.STRING).description("예약 시간 (HH:mm)")
 				)
 			));
 	}
