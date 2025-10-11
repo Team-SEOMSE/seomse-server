@@ -10,6 +10,7 @@ public record AppointmentListResponse(
 	String designerNickname,
 	String serviceName,
 	LocalDate appointmentDate,
-	LocalTime appointmentTime
+	LocalTime appointmentTime,
+	boolean hasReview
 ) {
 }

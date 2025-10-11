@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.seomse.IntegrationTestSupport;
 import com.seomse.fixture.interaction.appointment.AppointmentDetailFixture;
 import com.seomse.fixture.interaction.appointment.AppointmentFixture;
+import com.seomse.fixture.interaction.review.ReviewFixture;
 import com.seomse.fixture.shop.ShopFixture;
 import com.seomse.fixture.user.client.ClientFixture;
 import com.seomse.fixture.user.designer.DesignerFixture;
@@ -36,6 +37,8 @@ import com.seomse.interaction.appointment.repository.AppointmentDetailRepository
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
+import com.seomse.interaction.review.entity.ReviewEntity;
+import com.seomse.interaction.review.repository.ReviewRepository;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.shop.entity.DesignerShopEntity;
 import com.seomse.shop.entity.ShopEntity;
@@ -81,8 +84,12 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private AppointmentDetailRepository appointmentDetailRepository;
 
+	@Autowired
+	private ReviewRepository reviewRepository;
+
 	@AfterEach
 	void tearDown() {
+		reviewRepository.deleteAll();
 		appointmentDetailRepository.deleteAll();
 		appointmentRepository.deleteAll();
 		designerShopRepository.deleteAll();
@@ -424,7 +431,7 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 			.hasMessage("Appointment already exists.");
 	}
 
-	@DisplayName("예약 전체 조회 시 Client 예약을 반환한다.")
+	@DisplayName("예약 전체 조회 시 리뷰가 있는 Client 예약을 반환한다.")
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnClientAppointmentList() {
 		//given
@@ -455,6 +462,10 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
+		// review
+		ReviewEntity review = ReviewFixture.createReviewEntity(appointment);
+		reviewRepository.save(review);
+
 		//when
 		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
 
@@ -466,9 +477,10 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
 		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
 		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
+		assertThat(appointmentList.get(0).hasReview()).isTrue();
 	}
 
-	@DisplayName("예약 전체 조회 시 Owner 예약을 반환한다.")
+	@DisplayName("예약 전체 조회 시 리뷰가 있는 Owner 예약을 반환한다.")
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnOwnerAppointmentList() {
 		//given
@@ -496,6 +508,10 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
 		appointmentRepository.save(appointment);
 
+		// review
+		ReviewEntity review = ReviewFixture.createReviewEntity(appointment);
+		reviewRepository.save(review);
+
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(owner.getId(), Role.OWNER);
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
@@ -511,9 +527,10 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
 		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
 		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
+		assertThat(appointmentList.get(0).hasReview()).isTrue();
 	}
 
-	@DisplayName("예약 전체 조회 시 Designer 예약을 반환한다.")
+	@DisplayName("예약 전체 조회 시 리뷰가 있는 Designer 예약을 반환한다.")
 	@Test
 	void givenValidRequest_whenGetAppointmentList_thenReturnDesignerAppointmentList() {
 		//given
@@ -541,6 +558,10 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
 		appointmentRepository.save(appointment);
 
+		// review
+		ReviewEntity review = ReviewFixture.createReviewEntity(appointment);
+		reviewRepository.save(review);
+
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.DESIGNER);
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
@@ -556,6 +577,112 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
 		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
 		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
+		assertThat(appointmentList.get(0).hasReview()).isTrue();
+	}
+
+	@DisplayName("예약 전체 조회 시 Client 예약이 없으면 빈 리스트를 반환한다.")
+	@Test
+	void givenNoClientAppointments_whenGetAppointmentList_thenReturnEmptyList() {
+		//given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// DesignerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.CLIENT);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		//when
+		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
+
+		//then
+		// response
+		assertThat(appointmentList).isEmpty();
+	}
+
+	@DisplayName("예약 전체 조회 시 Owner 예약이 없으면 빈 리스트를 반환한다.")
+	@Test
+	void givenNoOwnerAppointments_whenGetAppointmentList_thenReturnEmptyList() {
+		//given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// DesignerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.OWNER);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		//when
+		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
+
+		//then
+		// response
+		assertThat(appointmentList).isEmpty();
+	}
+
+	@DisplayName("예약 전체 조회 시 Designer 예약이 없으면 빈 리스트를 반환한다.")
+	@Test
+	void givenNoDesignerAppointments_whenGetAppointmentList_thenReturnEmptyList() {
+		//given
+		// owner
+		OwnerEntity owner = OwnerFixture.createOwnerEntity();
+		ownerRepository.save(owner);
+
+		// shop
+		ShopEntity shop = ShopFixture.createShopEntity(owner);
+		shopRepository.save(shop);
+
+		// designer
+		DesignerEntity designer = DesignerFixture.createDesignerEntity();
+		designerRepository.save(designer);
+
+		// DesignerShop
+		DesignerShopEntity designerShop = new DesignerShopEntity(designer, shop);
+		designerShopRepository.save(designerShop);
+
+		// client
+		ClientEntity client = ClientFixture.createClient();
+		clientRepository.save(client);
+
+		LoginUserInfo fakeLoginUser = new LoginUserInfo(designer.getId(), Role.DESIGNER);
+		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
+
+		//when
+		List<AppointmentListResponse> appointmentList = appointmentService.getAppointmentList();
+
+		//then
+		// response
+		assertThat(appointmentList).isEmpty();
 	}
 
 	@DisplayName("예약 상세 조회에 성공하면 AppointmentDetailResponse를 반환한다.")

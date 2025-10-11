@@ -37,7 +37,11 @@ public class ReviewService {
 		MultipartFile reviewImage) {
 
 		AppointmentEntity appointment = appointmentRepository.findById(request.appointmentId())
-			.orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+			.orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
+
+		if (reviewRepository.existsByAppointmentId(appointment.getId())) {
+			throw new IllegalStateException("Review already exists for this appointment.");
+		}
 
 		String s3Key = null;
 		if (reviewImage != null && !reviewImage.isEmpty()) {
