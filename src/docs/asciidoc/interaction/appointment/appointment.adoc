@@ -71,7 +71,7 @@ include::{snippets}/appointment-get-detail-latest/response-fields.adoc[]
 ==== HTTP Request
 
 include::{snippets}/appointment-get-times/http-request.adoc[]
-include::{snippets}/appointment-get-times/request-fields.adoc[]
+include::{snippets}/appointment-get-times/query-parameters.adoc[]
 
 ==== HTTP Response
 

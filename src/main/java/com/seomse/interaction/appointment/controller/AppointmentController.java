@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,7 +65,7 @@ public class AppointmentController {
 
 	@GetMapping("/times")
 	public ApiResponse<List<AppointmentTimeListResponse>> getAppointmentByDesignerAndDateTime(
-		@Valid @RequestBody AppointmentDateRequest request) {
+		@Valid @ModelAttribute AppointmentDateRequest request) {
 		return ApiResponse.ok(appointmentService.getAppointmentByDesignerAndDateTime(request));
 	}
 }

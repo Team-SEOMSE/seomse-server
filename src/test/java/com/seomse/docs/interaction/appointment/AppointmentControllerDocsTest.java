@@ -295,28 +295,23 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		given(appointmentService.getAppointmentByDesignerAndDateTime(any(AppointmentDateRequest.class))).willReturn(
 			response);
 
-		// request
-		AppointmentDateRequest request = new AppointmentDateRequest(UUID.randomUUID(), UUID.randomUUID(),
-			LocalDate.of(2025, 9, 17));
-
-		String requestJson = objectMapper.writeValueAsString(request);
-
 		// when // then
 		mockMvc.perform(
 				get("/interaction/appointments/times")
 					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(requestJson)
+					.param("shopId", UUID.randomUUID().toString())
+					.param("designerId", UUID.randomUUID().toString())
+					.param("appointmentDate", "2025-09-17")
 			)
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("appointment-get-times",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				requestFields(
-					fieldWithPath("shopId").type(JsonFieldType.STRING).description("샵 UUID"),
-					fieldWithPath("designerId").type(JsonFieldType.STRING).description("디자이너 UUID"),
-					fieldWithPath("appointmentDate").type(JsonFieldType.STRING).description("예약 선택 날짜 (yyyy-MM-dd)")
+				queryParameters(
+					parameterWithName("shopId").description("샵 UUID"),
+					parameterWithName("designerId").description("디자이너 UUID"),
+					parameterWithName("appointmentDate").description("예약 선택 날짜 (yyyy-MM-dd)")
 				),
 				responseFields(
 					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
