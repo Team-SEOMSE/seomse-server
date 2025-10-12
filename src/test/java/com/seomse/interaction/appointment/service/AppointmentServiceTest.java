@@ -475,7 +475,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
 		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
-		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
+		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
+		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
 		assertThat(appointmentList.get(0).hasReview()).isTrue();
 	}
 
@@ -524,7 +525,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
 		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
-		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
+		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
+		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
 		assertThat(appointmentList.get(0).hasReview()).isTrue();
 	}
 
@@ -573,7 +575,8 @@ class AppointmentServiceTest extends IntegrationTestSupport {
 		assertThat(appointmentList.get(0).shopName()).isEqualTo("shopName");
 		assertThat(appointmentList.get(0).designerNickname()).isEqualTo("designerNickName");
 		assertThat(appointmentList.get(0).serviceName()).isEqualTo("serviceName");
-		assertThat(appointmentList.get(0).appointmentDate()).isNotNull();
+		assertThat(appointmentList.get(0).appointmentDate()).isEqualTo(LocalDate.now().plusDays(1));
+		assertThat(appointmentList.get(0).appointmentTime()).isEqualTo(LocalTime.of(12, 0));
 		assertThat(appointmentList.get(0).hasReview()).isTrue();
 	}
 

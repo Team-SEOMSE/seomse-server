@@ -32,7 +32,8 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate,
+				appointmentEntity.appointmentDate,
+				appointmentEntity.appointmentTime,
 				reviewEntity.id.isNotNull()
 			))
 			.from(appointmentEntity)
@@ -51,7 +52,8 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate,
+				appointmentEntity.appointmentDate,
+				appointmentEntity.appointmentTime,
 				reviewEntity.id.isNotNull()
 			))
 			.from(appointmentEntity)
@@ -70,7 +72,8 @@ public class AppointmentQueryRepository {
 				shopEntity.name,
 				designerEntity.nickname,
 				appointmentEntity.serviceName,
-				appointmentEntity.createdDate,
+				appointmentEntity.appointmentDate,
+				appointmentEntity.appointmentTime,
 				reviewEntity.id.isNotNull()
 			))
 			.from(appointmentEntity)
