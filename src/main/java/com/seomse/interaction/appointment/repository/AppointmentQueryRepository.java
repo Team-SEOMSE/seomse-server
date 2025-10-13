@@ -7,6 +7,8 @@ import static com.seomse.shop.entity.QDesignerShopEntity.*;
 import static com.seomse.shop.entity.QShopEntity.*;
 import static com.seomse.user.designer.entity.QDesignerEntity.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,6 +19,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
+import com.seomse.interaction.appointment.service.response.AppointmentTimeListResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -121,5 +124,35 @@ public class AppointmentQueryRepository {
 				.limit(1)
 				.fetchOne()
 		);
+	}
+
+	public List<AppointmentTimeListResponse> findAppointmentListByToday(UUID shopId, UUID designer,
+		LocalDate appointmentDate, LocalTime now) {
+		return jpaQueryFactory
+			.select(Projections.constructor(AppointmentTimeListResponse.class,
+				appointmentEntity.appointmentTime
+			))
+			.from(appointmentEntity)
+			.where(appointmentEntity.designerShop.shop.id.eq(shopId)
+				.and(appointmentEntity.designerShop.designer.id.eq(designer))
+				.and(appointmentEntity.appointmentDate.eq(appointmentDate)
+					.and(appointmentEntity.appointmentTime.gt(now))
+				)
+			)
+			.fetch();
+	}
+
+	public List<AppointmentTimeListResponse> findAppointmentListByDate(UUID shopId, UUID designer,
+		LocalDate appointmentDate) {
+		return jpaQueryFactory
+			.select(Projections.constructor(AppointmentTimeListResponse.class,
+				appointmentEntity.appointmentTime
+			))
+			.from(appointmentEntity)
+			.where(appointmentEntity.designerShop.shop.id.eq(shopId)
+				.and(appointmentEntity.designerShop.designer.id.eq(designer))
+				.and(appointmentEntity.appointmentDate.eq(appointmentDate))
+			)
+			.fetch();
 	}
 }

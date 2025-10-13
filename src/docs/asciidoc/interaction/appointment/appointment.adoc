@@ -65,3 +65,15 @@ include::{snippets}/appointment-get-detail-latest/http-request.adoc[]
 include::{snippets}/appointment-get-detail-latest/http-response.adoc[]
 include::{snippets}/appointment-get-detail-latest/response-fields.adoc[]
 
+[[appointment-get-times]]
+=== 예약 시간 조회
+
+==== HTTP Request
+
+include::{snippets}/appointment-get-times/http-request.adoc[]
+include::{snippets}/appointment-get-times/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/appointment-get-times/http-response.adoc[]
+include::{snippets}/appointment-get-times/response-fields.adoc[]

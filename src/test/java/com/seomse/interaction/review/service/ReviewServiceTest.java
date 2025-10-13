@@ -3,6 +3,7 @@ package com.seomse.interaction.review.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -44,6 +45,9 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 class ReviewServiceTest extends IntegrationTestSupport {
+
+	@Autowired
+	private Clock clock;
 
 	@Autowired
 	private ReviewService reviewService;
@@ -108,7 +112,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop, clock);
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -156,7 +160,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop, clock);
 		appointmentRepository.save(appointment);
 
 		LoginUserInfo fakeLoginUser = new LoginUserInfo(client.getId(), Role.CLIENT);
@@ -271,7 +275,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		// appointment
-		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop, clock);
 		appointmentRepository.save(appointment);
 
 		// review
@@ -316,7 +320,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop, clock);
 		appointmentRepository.save(appointment);
 
 		// review
@@ -366,7 +370,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		clientRepository.save(client);
 
 		// appointment
-		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop, clock);
 		appointmentRepository.save(appointment);
 
 		// review

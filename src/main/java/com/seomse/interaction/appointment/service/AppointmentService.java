@@ -1,7 +1,10 @@
 package com.seomse.interaction.appointment.service;
 
 import java.io.IOException;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.seomse.interaction.appointment.controller.request.AppointmentBaseRequest;
+import com.seomse.interaction.appointment.controller.request.AppointmentDateRequest;
 import com.seomse.interaction.appointment.controller.request.NormalAppointmentCreateRequest;
 import com.seomse.interaction.appointment.controller.request.SpecialAppointmentCreateRequest;
 import com.seomse.interaction.appointment.entity.AppointmentDetailEntity;
@@ -19,14 +23,19 @@ import com.seomse.interaction.appointment.repository.AppointmentQueryRepository;
 import com.seomse.interaction.appointment.repository.AppointmentRepository;
 import com.seomse.interaction.appointment.service.response.AppointmentDetailResponse;
 import com.seomse.interaction.appointment.service.response.AppointmentListResponse;
+import com.seomse.interaction.appointment.service.response.AppointmentTimeListResponse;
 import com.seomse.s3.service.S3Service;
 import com.seomse.security.jwt.dto.LoginUserInfo;
 import com.seomse.security.service.SecurityService;
 import com.seomse.shop.entity.DesignerShopEntity;
+import com.seomse.shop.entity.ShopEntity;
 import com.seomse.shop.repository.DesignerShopRepository;
+import com.seomse.shop.repository.ShopRepository;
 import com.seomse.user.auth.enums.Role;
 import com.seomse.user.client.entity.ClientEntity;
 import com.seomse.user.client.repository.ClientRepository;
+import com.seomse.user.designer.entity.DesignerEntity;
+import com.seomse.user.designer.repository.DesignerRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +44,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AppointmentService {
 
+	private final Clock clock;
 	private final SecurityService securityService;
 	private final S3Service s3Service;
 	private final ClientRepository clientRepository;
@@ -42,6 +52,8 @@ public class AppointmentService {
 	private final AppointmentRepository appointmentRepository;
 	private final AppointmentDetailRepository appointmentDetailRepository;
 	private final AppointmentQueryRepository appointmentQueryRepository;
+	private final ShopRepository shopRepository;
+	private final DesignerRepository designerRepository;
 
 	public UUID createNormalAppointment(NormalAppointmentCreateRequest request) {
 		return createBaseAppointment(request).getId();
@@ -72,7 +84,7 @@ public class AppointmentService {
 	private AppointmentEntity createBaseAppointment(AppointmentBaseRequest request) {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
 
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now(clock);
 		LocalDateTime appointmentDateTime = LocalDateTime.of(request.appointmentDate(), request.appointmentTime());
 
 		if (appointmentDateTime.isBefore(now)) {
@@ -132,5 +144,30 @@ public class AppointmentService {
 		LoginUserInfo loginUser = securityService.getCurrentLoginUserInfo();
 		return appointmentQueryRepository.findAppointmentDetailByLatest(loginUser.userId())
 			.orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
+	}
+
+	@Transactional(readOnly = true)
+	public List<AppointmentTimeListResponse> getAppointmentByDesignerAndDateTime(AppointmentDateRequest request) {
+		ShopEntity shop = shopRepository.findById(request.shopId())
+			.orElseThrow(() -> new IllegalArgumentException("Shop not found."));
+
+		DesignerEntity designer = designerRepository.findById(request.designerId())
+			.orElseThrow(() -> new IllegalArgumentException("Designer not found."));
+
+		LocalDateTime dateTime = LocalDateTime.now(clock);
+		LocalDate today = dateTime.toLocalDate();
+		LocalTime now = dateTime.toLocalTime();
+
+		if (request.appointmentDate().isBefore(today)) {
+			throw new IllegalArgumentException("past date is not allowed.");
+		}
+
+		if (request.appointmentDate().equals(today)) {
+			return appointmentQueryRepository.findAppointmentListByToday(
+				request.shopId(), request.designerId(), request.appointmentDate(), now);
+		}
+
+		return appointmentQueryRepository.findAppointmentListByDate(
+			request.shopId(), request.designerId(), request.appointmentDate());
 	}
 }
