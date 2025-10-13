@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -177,7 +178,7 @@ public class AppointmentControllerDocsTest extends RestDocsSupport {
 		// given
 		List<AppointmentListResponse> response = List.of(new AppointmentListResponse(
 				UUID.randomUUID(), "shopName1", "designerNickName1",
-				"serviceName1", LocalDate.now().plusDays(1), LocalTime.of(12, 0),false),
+				"serviceName1", LocalDate.now().plusDays(1), LocalTime.of(12, 0), false),
 			new AppointmentListResponse(
 				UUID.randomUUID(), "shopName2", "designerNickName1",
 				"serviceName2", LocalDate.now().plusDays(1), LocalTime.of(12, 0), false)

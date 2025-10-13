@@ -275,7 +275,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		given(securityService.getCurrentLoginUserInfo()).willReturn(fakeLoginUser);
 
 		// appointment
-		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop);
+		AppointmentEntity appointment = AppointmentFixture.createAppointmentEntity(client, designerShop, clock);
 		appointmentRepository.save(appointment);
 
 		// review
