@@ -33,3 +33,8 @@ include::interaction/appointment/appointment.adoc[]
 == Review API
 
 include::interaction/review/review.adoc[]
+
+[[Style-API]]
+== Style API
+
+include::interaction/style/style.adoc[]

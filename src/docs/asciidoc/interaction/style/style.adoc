@@ -1,0 +1,15 @@
+[[style-analysis]]
+=== 스타일 분석
+
+==== HTTP Request
+
+include::{snippets}/style-analysis/http-request.adoc[]
+
+==== Request Parts
+
+include::{snippets}/style-analysis/request-parts.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/style-analysis/http-response.adoc[]
+include::{snippets}/style-analysis/response-fields.adoc[]
