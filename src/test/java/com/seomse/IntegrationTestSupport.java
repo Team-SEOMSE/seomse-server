@@ -4,6 +4,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.seomse.interaction.style.client.AiApiClient;
 import com.seomse.security.feign.kakao.KakaoApiFeignCall;
 import com.seomse.security.feign.kakao.KakaoAuthFeignCall;
 import com.seomse.security.service.SecurityService;
@@ -26,5 +27,7 @@ public abstract class IntegrationTestSupport {
 	@MockitoBean
 	protected S3Client s3Client;
 
+	@MockitoBean
+	protected AiApiClient aiApiClient;
 }
 
