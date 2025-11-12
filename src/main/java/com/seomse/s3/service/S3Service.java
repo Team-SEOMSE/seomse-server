@@ -48,7 +48,7 @@ public class S3Service {
 			RequestBody.fromInputStream(file.getInputStream(), file.getSize())
 		);
 
-		return cloudFrontDomain + "/" + key;
+		return "https://" + cloudFrontDomain + "/" + key;
 	}
 
 	private String getExtension(String fileName) {
