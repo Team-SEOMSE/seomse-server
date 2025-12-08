@@ -4,6 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.seomse.interaction.style.service.dto.AiVirtualTryOnRequest;
 import com.seomse.interaction.style.service.dto.StyleAnalysisRequest;
 import com.seomse.interaction.style.service.dto.StyleAnalysisResponse;
 
@@ -23,6 +24,17 @@ public class AiApiClient {
 			.bodyValue(requestBody)
 			.retrieve()
 			.bodyToMono(StyleAnalysisResponse.class)
+			.block();
+	}
+
+	public byte[] virtualTryOn(AiVirtualTryOnRequest requestBody) {
+		return webClient.post()
+			.uri("/virtual-try-on")
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.IMAGE_PNG)
+			.bodyValue(requestBody)
+			.retrieve()
+			.bodyToMono(byte[].class)
 			.block();
 	}
 }
