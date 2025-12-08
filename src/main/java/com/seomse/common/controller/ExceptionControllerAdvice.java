@@ -52,8 +52,13 @@ public class ExceptionControllerAdvice {
 	public ResponseEntity<Object> methodArgumentNotValidException(MethodArgumentNotValidException e) {
 		log.error(e.getMessage(), e);
 
+		String errorMessage = e.getBindingResult()
+			.getAllErrors()
+			.get(0)
+			.getDefaultMessage();
+
 		return ResponseEntity.status(BAD_REQUEST)
-			.body(new ExceptionResult(BAD_REQUEST.name(), e.getMessage()));
+			.body(new ExceptionResult(BAD_REQUEST.name(), errorMessage));
 	}
 
 	/** Handles JWT authentication errors (JwtTokenException). */

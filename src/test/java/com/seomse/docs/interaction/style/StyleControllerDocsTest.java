@@ -20,8 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.seomse.docs.RestDocsSupport;
 import com.seomse.interaction.style.controller.StyleController;
+import com.seomse.interaction.style.controller.request.VirtualTryOnRequest;
 import com.seomse.interaction.style.service.StyleService;
 import com.seomse.interaction.style.service.dto.StyleAnalysisResponse;
+import com.seomse.interaction.style.service.dto.VirtualTryOnResponse;
+import com.seomse.interaction.style.service.request.VirtualTryOnServiceRequest;
 
 public class StyleControllerDocsTest extends RestDocsSupport {
 
@@ -91,6 +94,54 @@ public class StyleControllerDocsTest extends RestDocsSupport {
 						.description("추천 헤어 컬러 이름"),
 					fieldWithPath("data.recommendations.hairColor.reason").type(JsonFieldType.STRING)
 						.description("추천 이유")
+				)
+			));
+	}
+
+	@DisplayName("가상 헤어스타일 체험 API")
+	@Test
+	void virtualTryOn() throws Exception {
+		// given
+		VirtualTryOnRequest request = new VirtualTryOnRequest(
+			"https://test.cloudfront.net/style/test.png",
+			"댄디컷",
+			"애쉬 브라운"
+		);
+
+		VirtualTryOnResponse response = new VirtualTryOnResponse(
+			"https://test.cloudfront.net/style/generated_result.png"
+		);
+
+		given(styleService.callVirtualTryOn(any(VirtualTryOnServiceRequest.class)))
+			.willReturn(response);
+
+		// when // then
+		mockMvc.perform(
+				post("/interaction/styles/virtual-try-on")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer <JWT ACCESS TOKEN>")
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(MediaType.APPLICATION_JSON)
+			)
+			.andExpect(status().isCreated())
+			.andDo(print())
+			.andDo(document("style-virtual-try-on",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+
+				requestFields(
+					fieldWithPath("imageUrl").type(JsonFieldType.STRING)
+						.description("원본 이미지 URL"),
+					fieldWithPath("targetHairstyle").type(JsonFieldType.STRING)
+						.description("적용할 타겟 헤어스타일 이름 (예: 댄디컷, 리젠트컷)"),
+					fieldWithPath("targetHairColor").type(JsonFieldType.STRING)
+						.description("적용할 타겟 헤어 컬러 (예: 애쉬 브라운, 블랙)")
+				),
+
+				responseFields(
+					fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("응답 코드"),
+					fieldWithPath("data").type(JsonFieldType.OBJECT).description("가상 체험 결과 데이터"),
+					fieldWithPath("data.generatedImageUrl").type(JsonFieldType.STRING)
+						.description("생성된 가상 체험 결과 이미지 URL")
 				)
 			));
 	}

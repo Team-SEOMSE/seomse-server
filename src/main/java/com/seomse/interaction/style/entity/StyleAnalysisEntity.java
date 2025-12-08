@@ -44,10 +44,17 @@ public class StyleAnalysisEntity extends BaseTimeEntity {
 	@Column(nullable = false)
 	private StyleAnalysisResponse result;
 
+	@Column(length = 190)
+	private String virtualTryOnImage;
+
 	public StyleAnalysisEntity(ClientEntity client, String image, StyleAnalysisResponse result) {
 		this.client = client;
 		this.image = image;
 		this.result = result;
+	}
+
+	public void updateVirtualTryOnImage(String virtualTryOnImageUrl) {
+		this.virtualTryOnImage = virtualTryOnImageUrl;
 	}
 }
 
