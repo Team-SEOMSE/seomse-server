@@ -13,3 +13,16 @@ include::{snippets}/style-analysis/request-parts.adoc[]
 
 include::{snippets}/style-analysis/http-response.adoc[]
 include::{snippets}/style-analysis/response-fields.adoc[]
+
+[[style-virtual-try-on]]
+=== 스타일 가상 체험
+
+==== HTTP Request
+
+include::{snippets}/style-virtual-try-on/http-request.adoc[]
+include::{snippets}/style-virtual-try-on/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/style-virtual-try-on/http-response.adoc[]
+include::{snippets}/style-virtual-try-on/response-fields.adoc[]

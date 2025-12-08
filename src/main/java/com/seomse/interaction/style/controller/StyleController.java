@@ -33,7 +33,7 @@ public class StyleController {
 	}
 
 	@PostMapping("/virtual-try-on")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResponse<VirtualTryOnResponse> virtualTryOn(@RequestBody VirtualTryOnRequest request) throws IOException {
 		return ApiResponse.created(styleService.callVirtualTryOn(request.toServiceRequest()));
 	}

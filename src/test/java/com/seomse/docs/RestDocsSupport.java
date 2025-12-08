@@ -1,9 +1,8 @@
 package com.seomse.docs;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -16,6 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @ExtendWith(RestDocumentationExtension.class)
+@AutoConfigureRestDocs(uriHost = "api.seomse.kro.kr")
 public abstract class RestDocsSupport {
 
 	protected MockMvc mockMvc;
@@ -31,15 +31,10 @@ public abstract class RestDocsSupport {
 	void setup(RestDocumentationContextProvider provider) {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
 			.setMessageConverters(new MappingJackson2HttpMessageConverter(this.objectMapper))
-			.apply(MockMvcRestDocumentation.documentationConfiguration(provider)
-				.operationPreprocessors()
-				.withRequestDefaults(modifyUris()
-						.scheme("https")
-						.host("api.seomse.kro.kr")
-						.removePort(),
-					prettyPrint())
-				.withResponseDefaults(prettyPrint())
-			)
+			.apply(MockMvcRestDocumentation.documentationConfiguration(provider).uris()
+				.withScheme("https")
+				.withHost("api.seomse.kro.kr")
+				.withPort(443))
 			.build();
 	}
 
